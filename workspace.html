@@ -246,20 +246,71 @@
               <h2>Prototype Snapshots</h2>
               <p>Review the captured evidence from service pilots to determine the viability of shortlisted alternatives.</p>
               <div class="photo-grid">
-                <figure>
-                  <img src="https://images.unsplash.com/photo-1529429617124-aee5b8d711b5?auto=format&fit=crop&w=700&q=60"
-                    alt="Passengers boarding a prototype shuttle" />
+                <figure class="evaluation-photo" data-image-id="prototype-shuttle">
+                  <div class="photo-wrapper">
+                    <img src="https://images.unsplash.com/photo-1529429617124-aee5b8d711b5?auto=format&fit=crop&w=1400&q=80"
+                      alt="Passengers boarding a prototype shuttle" />
+                    <button type="button" class="photo-zoom" aria-label="View passengers boarding a prototype shuttle">
+                      <span aria-hidden="true">🔍</span>
+                    </button>
+                    <span class="ranking-badge" hidden></span>
+                  </div>
                   <figcaption>Live usability study on the adaptive shuttle entry sequence.</figcaption>
+                  <label class="ranking-control" for="rank-prototype-shuttle">
+                    <span>Assign a rank</span>
+                    <select id="rank-prototype-shuttle" class="ranking-select" data-image-id="prototype-shuttle">
+                      <option value="">Unranked</option>
+                      <option value="1">Rank 1 — Leading Concept</option>
+                      <option value="2">Rank 2 — Strong Contender</option>
+                      <option value="3">Rank 3 — Needs Refinement</option>
+                      <option value="4">Rank 4 — Backup Option</option>
+                      <option value="5">Rank 5 — Not Recommended</option>
+                    </select>
+                  </label>
                 </figure>
-                <figure>
-                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=60"
-                    alt="Designers reviewing analytics on a large screen" />
+                <figure class="evaluation-photo" data-image-id="telemetry-dashboard">
+                  <div class="photo-wrapper">
+                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1400&q=80"
+                      alt="Designers reviewing analytics on a large screen" />
+                    <button type="button" class="photo-zoom" aria-label="View designers reviewing analytics on a large screen">
+                      <span aria-hidden="true">🔍</span>
+                    </button>
+                    <span class="ranking-badge" hidden></span>
+                  </div>
                   <figcaption>Integrated telemetry dashboard tracking energy consumption.</figcaption>
+                  <label class="ranking-control" for="rank-telemetry-dashboard">
+                    <span>Assign a rank</span>
+                    <select id="rank-telemetry-dashboard" class="ranking-select" data-image-id="telemetry-dashboard">
+                      <option value="">Unranked</option>
+                      <option value="1">Rank 1 — Leading Concept</option>
+                      <option value="2">Rank 2 — Strong Contender</option>
+                      <option value="3">Rank 3 — Needs Refinement</option>
+                      <option value="4">Rank 4 — Backup Option</option>
+                      <option value="5">Rank 5 — Not Recommended</option>
+                    </select>
+                  </label>
                 </figure>
-                <figure>
-                  <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=700&q=60"
-                    alt="Facilitators testing accessibility features" />
+                <figure class="evaluation-photo" data-image-id="accessibility-trials">
+                  <div class="photo-wrapper">
+                    <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=1400&q=80"
+                      alt="Facilitators testing accessibility features" />
+                    <button type="button" class="photo-zoom" aria-label="View facilitators testing accessibility features">
+                      <span aria-hidden="true">🔍</span>
+                    </button>
+                    <span class="ranking-badge" hidden></span>
+                  </div>
                   <figcaption>Accessibility trials focusing on seamless transfers.</figcaption>
+                  <label class="ranking-control" for="rank-accessibility-trials">
+                    <span>Assign a rank</span>
+                    <select id="rank-accessibility-trials" class="ranking-select" data-image-id="accessibility-trials">
+                      <option value="">Unranked</option>
+                      <option value="1">Rank 1 — Leading Concept</option>
+                      <option value="2">Rank 2 — Strong Contender</option>
+                      <option value="3">Rank 3 — Needs Refinement</option>
+                      <option value="4">Rank 4 — Backup Option</option>
+                      <option value="5">Rank 5 — Not Recommended</option>
+                    </select>
+                  </label>
                 </figure>
               </div>
             </div>
@@ -352,6 +403,15 @@
     </section>
   </main>
 
+  <div class="evaluation-lightbox" role="dialog" aria-modal="true" aria-hidden="true" hidden>
+    <div class="lightbox-backdrop" data-close="true"></div>
+    <div class="lightbox-content">
+      <button type="button" class="lightbox-close" aria-label="Close expanded prototype image" data-close="true">✕</button>
+      <img class="lightbox-image" src="" alt="" />
+      <p class="lightbox-caption"></p>
+    </div>
+  </div>
+
   <script>
     (function () {
       const stageButtons = Array.from(document.querySelectorAll('.stage-step'));
@@ -367,6 +427,7 @@
       const SUMMARY_KEY = (stage) => `${STORAGE_PREFIX}-summary-${stage}`;
       const STATUS_KEY = `${STORAGE_PREFIX}-stage-status`;
       const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
+      const RANKING_KEY = `${STORAGE_PREFIX}-evaluation-rankings`;
 
       const stageConfig = {
         'problem-definition': {
@@ -410,6 +471,7 @@
       }
 
       const stageStatus = parseStoredJSON(STATUS_KEY, {});
+      const rankingStore = parseStoredJSON(RANKING_KEY, {});
 
       function persistStatus(stage, completed) {
         stageStatus[stage] = completed;
@@ -450,6 +512,114 @@
 
       stageButtons.forEach((button, index) => {
         button.addEventListener('click', () => showStage(index));
+      });
+
+      const evaluationPhotos = Array.from(document.querySelectorAll('.evaluation-photo'));
+      const lightbox = document.querySelector('.evaluation-lightbox');
+      const lightboxImg = lightbox?.querySelector('.lightbox-image');
+      const lightboxCaption = lightbox?.querySelector('.lightbox-caption');
+
+      function openLightbox(img, caption) {
+        if (!lightbox || !lightboxImg || !lightboxCaption) return;
+        lightboxImg.src = img.currentSrc || img.src;
+        lightboxImg.alt = img.alt || '';
+        lightboxCaption.textContent = caption || '';
+        lightbox.classList.add('open');
+        lightbox.removeAttribute('hidden');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('lightbox-open');
+      }
+
+      function closeLightbox() {
+        if (!lightbox || !lightboxImg || !lightboxCaption) return;
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightbox.setAttribute('hidden', '');
+        lightboxImg.src = '';
+        lightboxImg.alt = '';
+        lightboxCaption.textContent = '';
+        document.body.classList.remove('lightbox-open');
+      }
+
+      evaluationPhotos.forEach((figure) => {
+        const img = figure.querySelector('img');
+        const caption = figure.querySelector('figcaption')?.textContent || '';
+        const zoomButton = figure.querySelector('.photo-zoom');
+
+        function handleOpen() {
+          if (img) {
+            openLightbox(img, caption);
+          }
+        }
+
+        if (img) {
+          img.addEventListener('click', handleOpen);
+        }
+
+        if (zoomButton) {
+          zoomButton.addEventListener('click', handleOpen);
+        }
+      });
+
+      if (lightbox) {
+        lightbox.addEventListener('click', (event) => {
+          if (event.target instanceof HTMLElement && event.target.dataset.close === 'true') {
+            closeLightbox();
+          }
+        });
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape' && lightbox.classList.contains('open')) {
+            closeLightbox();
+          }
+        });
+      }
+
+      function updateRankingBadge(figure, value) {
+        const badge = figure.querySelector('.ranking-badge');
+        if (!badge) return;
+        if (!value) {
+          badge.textContent = '';
+          badge.hidden = true;
+          figure.classList.remove('is-ranked');
+          return;
+        }
+        const label = `Rank ${value}`;
+        badge.textContent = label;
+        badge.hidden = false;
+        figure.classList.add('is-ranked');
+      }
+
+      function persistRankings() {
+        localStorage.setItem(RANKING_KEY, JSON.stringify(rankingStore));
+      }
+
+      const rankingSelects = Array.from(document.querySelectorAll('.ranking-select'));
+
+      rankingSelects.forEach((select) => {
+        const { imageId } = select.dataset;
+        if (!imageId) return;
+        const figure = document.querySelector(`.evaluation-photo[data-image-id="${imageId}"]`);
+        const storedValue = rankingStore[imageId];
+        if (storedValue) {
+          select.value = storedValue;
+          if (figure) {
+            updateRankingBadge(figure, storedValue);
+          }
+        }
+
+        select.addEventListener('change', () => {
+          const value = select.value;
+          if (value) {
+            rankingStore[imageId] = value;
+          } else {
+            delete rankingStore[imageId];
+          }
+          if (figure) {
+            updateRankingBadge(figure, value);
+          }
+          persistRankings();
+        });
       });
 
       function showTab(id) {
