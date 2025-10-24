@@ -16,18 +16,376 @@
       <li><a href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a></li>
     </ul>
   </nav>
-  <main class="content">
-    <header>
+  <main class="content workspace-main">
+    <header class="workspace-header">
       <h1>Collaborative Workspace</h1>
+      <p>
+        Progress through the proactive product-service system strategy with guided prompts, evidence-rich visuals, and real-time
+        dialogue powered by the ChatGPT API. Each stage below mirrors the workflow documented in the research article and
+        captures the evolving intelligence of the design team.
+      </p>
     </header>
-    <section>
-      <p>
-        The workspace provides structured prompts and ideation canvases that guide design teams through the proactive product-service system strategy. ChatGPT facilitates the exploration of service scenarios, risk mitigation, and value co-creation opportunities inspired by the modular workflow described in the article.
-      </p>
-      <p>
-        Team members can document stakeholder needs, generate solution concepts, and refine deliverables in real time, capturing the iterative dialogue that underpins the case study.
-      </p>
+
+    <section class="workflow">
+      <div class="stage-navigation" role="tablist" aria-label="Workspace stages">
+        <button type="button" class="stage-step active" data-stage="problem-definition" data-index="0" role="tab"
+          aria-selected="true">
+          <span class="step-icon">🧭</span>
+          <span class="step-label">Problem Definition</span>
+        </button>
+        <button type="button" class="stage-step" data-stage="data-analysis" data-index="1" role="tab"
+          aria-selected="false">
+          <span class="step-icon">📊</span>
+          <span class="step-label">Data Analysis</span>
+        </button>
+        <button type="button" class="stage-step" data-stage="design-alternatives" data-index="2" role="tab"
+          aria-selected="false">
+          <span class="step-icon">🛠️</span>
+          <span class="step-label">Design/Plan Alternatives</span>
+        </button>
+        <button type="button" class="stage-step" data-stage="design-evaluation" data-index="3" role="tab"
+          aria-selected="false">
+          <span class="step-icon">🔍</span>
+          <span class="step-label">Design/Plan Evaluation</span>
+        </button>
+        <button type="button" class="stage-step" data-stage="design-evaluation-report" data-index="4" role="tab"
+          aria-selected="false">
+          <span class="step-icon">📑</span>
+          <span class="step-label">Design/Plan Evaluation Report</span>
+        </button>
+      </div>
+
+      <div class="stage-container">
+        <article id="problem-definition" class="stage-content active" role="tabpanel">
+          <div class="stage-grid">
+            <div class="stage-panel narrative-panel">
+              <figure class="hero-figure">
+                <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=60"
+                  alt="Designers collaborating with post-it notes" />
+                <figcaption>Mapping stakeholder ambitions, constraints, and sustainability mandates for the PPSS vision.</figcaption>
+              </figure>
+              <div class="panel-copy">
+                <h2>Clarify the Strategic Challenge</h2>
+                <p>
+                  Capture the drivers behind the proactive product-service system initiative. Articulate the socio-technical
+                  problem, define the service boundary, and document the organizational commitments that underpin the program.
+                </p>
+                <p>
+                  Summarize stakeholder archetypes, targeted customer experiences, and the resilience indicators emphasized in the
+                  article's case study to frame the design conversation.
+                </p>
+              </div>
+            </div>
+            <div class="stage-panel chat-panel">
+              <header>
+                <h2>ChatGPT Facilitation</h2>
+                <p class="chat-description">Live conversation through the ChatGPT API to expand the shared understanding of the
+                  PPSS challenge.</p>
+              </header>
+              <div class="chat-log" aria-live="polite">
+                <div class="message assistant">
+                  <span class="role">Assistant</span>
+                  <p>Welcome to the proactive product-service system workspace. How would you describe the core sustainability
+                    goal driving this project?</p>
+                </div>
+                <div class="message user">
+                  <span class="role">Designer</span>
+                  <p>We want to reduce the energy footprint of our mobility service while improving accessibility for commuters.</p>
+                </div>
+              </div>
+              <form class="chat-form" aria-label="Send a message to ChatGPT">
+                <label class="visually-hidden" for="message-stage-1">Message</label>
+                <textarea id="message-stage-1" name="message" rows="3" placeholder="Compose your prompt..." required></textarea>
+                <button type="submit">Send to ChatGPT API</button>
+              </form>
+            </div>
+          </div>
+        </article>
+
+        <article id="data-analysis" class="stage-content" role="tabpanel" hidden>
+          <div class="stage-grid">
+            <div class="stage-panel analysis-panel">
+              <h2>Evidence Canvases</h2>
+              <p>Select a tab to review the synthesized evidence captured for the data analysis stage.</p>
+              <div class="data-tabs" role="tablist" aria-label="Data analysis evidence tabs">
+                <button type="button" class="data-tab active" data-tab="patterns" role="tab" aria-selected="true">Usage
+                  Patterns</button>
+                <button type="button" class="data-tab" data-tab="painpoints" role="tab" aria-selected="false">Pain
+                  Points</button>
+                <button type="button" class="data-tab" data-tab="opportunities" role="tab" aria-selected="false">Emerging
+                  Opportunities</button>
+              </div>
+              <div class="data-tab-content active" id="patterns" role="tabpanel">
+                <img src="https://images.unsplash.com/photo-1517148815978-75f6acaaf32c?auto=format&fit=crop&w=900&q=60"
+                  alt="Commuters boarding eco-friendly buses" />
+                <p>
+                  Demand clusters reveal peak travel loads across transit corridors. ChatGPT assists by explaining latent
+                  correlations between commuter behaviors and service downtimes extracted from the case study dataset.
+                </p>
+              </div>
+              <div class="data-tab-content" id="painpoints" role="tabpanel" hidden>
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=60"
+                  alt="A commuter struggling with a ticketing kiosk" />
+                <p>
+                  Incident narratives expose accessibility barriers and energy-intensive detours. The assistant recommends
+                  service blueprints that minimize waiting time while improving the carbon performance of the fleet.
+                </p>
+              </div>
+              <div class="data-tab-content" id="opportunities" role="tabpanel" hidden>
+                <img src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=900&q=60"
+                  alt="Aerial view of a smart mobility hub" />
+                <p>
+                  Emerging mobility hubs introduce modular charging nodes and predictive maintenance. ChatGPT highlights
+                  partnerships that can co-create regenerative value propositions aligned with the PPSS platform.
+                </p>
+              </div>
+            </div>
+            <div class="stage-panel chat-panel">
+              <header>
+                <h2>Analytical Dialogue</h2>
+                <p class="chat-description">Interrogate datasets with contextual prompts and retrieve quantitative or qualitative
+                  insights generated via the ChatGPT API.</p>
+              </header>
+              <div class="chat-log" aria-live="polite">
+                <div class="message assistant">
+                  <span class="role">Assistant</span>
+                  <p>I can summarize the variance in ridership across weekdays versus weekends. Would you like a chart-ready
+                    breakdown?</p>
+                </div>
+              </div>
+              <form class="chat-form" aria-label="Send a message to ChatGPT">
+                <label class="visually-hidden" for="message-stage-2">Message</label>
+                <textarea id="message-stage-2" name="message" rows="3"
+                  placeholder="Ask about anomalies, clusters, or correlations..." required></textarea>
+                <button type="submit">Send to ChatGPT API</button>
+              </form>
+            </div>
+          </div>
+        </article>
+
+        <article id="design-alternatives" class="stage-content" role="tabpanel" hidden>
+          <div class="stage-grid">
+            <div class="stage-panel gallery-panel">
+              <h2>Concept Visualizations</h2>
+              <p>
+                Preview images generated through the ChatGPT image pipeline to provoke conversations on modular service concepts.
+              </p>
+              <div class="image-strip">
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1535223289827-42f1e9919769?auto=format&fit=crop&w=800&q=60"
+                    alt="Futuristic eco-friendly shuttle design" />
+                  <figcaption>Autonomous shuttle concept with adaptive lighting.</figcaption>
+                </figure>
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=60"
+                    alt="Smart mobility service hub at dusk" />
+                  <figcaption>Service hub integrating micro-mobility drop-off points.</figcaption>
+                </figure>
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1529429617124-aee5b8d711b5?auto=format&fit=crop&w=800&q=60"
+                    alt="Interior of an accessible transit pod" />
+                  <figcaption>Universal design interior layout for inclusive commuting.</figcaption>
+                </figure>
+              </div>
+            </div>
+            <div class="stage-panel chat-panel">
+              <header>
+                <h2>Co-creation Dialogue</h2>
+                <p class="chat-description">Iterate on alternative concepts, assess feasibility, and request synthesized design
+                  briefs from the ChatGPT API.</p>
+              </header>
+              <div class="chat-log" aria-live="polite">
+                <div class="message assistant">
+                  <span class="role">Assistant</span>
+                  <p>Shall I compare the lifecycle emissions for the three proposed shuttle configurations?</p>
+                </div>
+                <div class="message user">
+                  <span class="role">Engineer</span>
+                  <p>Yes, prioritize recycled materials and modular upgrades for long-term adaptability.</p>
+                </div>
+              </div>
+              <form class="chat-form" aria-label="Send a message to ChatGPT">
+                <label class="visually-hidden" for="message-stage-3">Message</label>
+                <textarea id="message-stage-3" name="message" rows="3" placeholder="Describe a new alternative..."
+                  required></textarea>
+                <button type="submit">Send to ChatGPT API</button>
+              </form>
+            </div>
+          </div>
+        </article>
+
+        <article id="design-evaluation" class="stage-content" role="tabpanel" hidden>
+          <div class="stage-grid">
+            <div class="stage-panel evaluation-panel">
+              <h2>Prototype Snapshots</h2>
+              <p>Review the captured evidence from service pilots to determine the viability of shortlisted alternatives.</p>
+              <div class="photo-grid">
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1529429617124-aee5b8d711b5?auto=format&fit=crop&w=700&q=60"
+                    alt="Passengers boarding a prototype shuttle" />
+                  <figcaption>Live usability study on the adaptive shuttle entry sequence.</figcaption>
+                </figure>
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=60"
+                    alt="Designers reviewing analytics on a large screen" />
+                  <figcaption>Integrated telemetry dashboard tracking energy consumption.</figcaption>
+                </figure>
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?auto=format&fit=crop&w=700&q=60"
+                    alt="Facilitators testing accessibility features" />
+                  <figcaption>Accessibility trials focusing on seamless transfers.</figcaption>
+                </figure>
+              </div>
+            </div>
+            <div class="stage-panel chat-panel">
+              <header>
+                <h2>Evaluation Dialogue</h2>
+                <p class="chat-description">Deploy the ChatGPT API to quantify trade-offs, narrate customer journeys, and prioritize
+                  refinements.</p>
+              </header>
+              <div class="chat-log" aria-live="polite">
+                <div class="message assistant">
+                  <span class="role">Assistant</span>
+                  <p>I can simulate the service level impact if we scale the adaptive shuttle fleet. Should I run the scenario?</p>
+                </div>
+              </div>
+              <form class="chat-form" aria-label="Send a message to ChatGPT">
+                <label class="visually-hidden" for="message-stage-4">Message</label>
+                <textarea id="message-stage-4" name="message" rows="3"
+                  placeholder="Request comparative evaluations or metrics..." required></textarea>
+                <button type="submit">Send to ChatGPT API</button>
+              </form>
+            </div>
+          </div>
+        </article>
+
+        <article id="design-evaluation-report" class="stage-content" role="tabpanel" hidden>
+          <div class="stage-grid">
+            <div class="stage-panel report-panel">
+              <h2>Evaluation Report</h2>
+              <p>
+                Consolidate insights into a publishable narrative structured around the proactive product-service system strategy.
+              </p>
+              <div class="report-body">
+                <h3>Executive Summary</h3>
+                <p>
+                  The integrated mobility service reduces per-passenger emissions by 28% compared to the baseline. Customer
+                  satisfaction improves through predictive scheduling and inclusive design touchpoints.
+                </p>
+                <h3>Key Findings</h3>
+                <ul>
+                  <li>Adaptive routing lowers congestion events by 18% during peak windows.</li>
+                  <li>Energy-efficient materials extend vehicle lifecycles by 22%.</li>
+                  <li>Service partnerships unlock three new regenerative revenue streams.</li>
+                </ul>
+                <h3>Next Steps</h3>
+                <p>
+                  Scale the telemetry stack across partner fleets, finalize stakeholder governance, and prepare a policy briefing
+                  aligned with the article's recommendations.
+                </p>
+              </div>
+            </div>
+            <div class="stage-panel insights-panel">
+              <h2>Visual Evidence & Metrics</h2>
+              <div class="insight-gallery">
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=700&q=60"
+                    alt="Team reviewing service deployment visuals" />
+                  <figcaption>Field validation imagery curated for the report appendix.</figcaption>
+                </figure>
+                <figure>
+                  <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=700&q=60"
+                    alt="Analytics dashboard showing service KPIs" />
+                  <figcaption>Energy and service KPIs extracted from the evaluation dashboard.</figcaption>
+                </figure>
+              </div>
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <span class="metric-value">92%</span>
+                  <span class="metric-label">Rider Satisfaction</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">-28%</span>
+                  <span class="metric-label">Emission Reduction</span>
+                </div>
+                <div class="metric-card">
+                  <span class="metric-value">3</span>
+                  <span class="metric-label">New Partnerships</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
+
+  <script>
+    const stageButtons = Array.from(document.querySelectorAll('.stage-step'));
+    const stageContents = Array.from(document.querySelectorAll('.stage-content'));
+
+    function showStage(index) {
+      stageButtons.forEach((btn, idx) => {
+        const isActive = idx === index;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        btn.classList.toggle('completed', idx < index);
+      });
+
+      stageContents.forEach((panel, idx) => {
+        const shouldShow = idx === index;
+        panel.classList.toggle('active', shouldShow);
+        panel.toggleAttribute('hidden', !shouldShow);
+      });
+    }
+
+    stageButtons.forEach((button, index) => {
+      button.addEventListener('click', () => showStage(index));
+    });
+
+    const tabButtons = Array.from(document.querySelectorAll('.data-tab'));
+    const tabPanels = Array.from(document.querySelectorAll('.data-tab-content'));
+
+    function showTab(id) {
+      tabButtons.forEach((btn) => {
+        const isActive = btn.dataset.tab === id;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      tabPanels.forEach((panel) => {
+        const shouldShow = panel.id === id;
+        panel.classList.toggle('active', shouldShow);
+        panel.toggleAttribute('hidden', !shouldShow);
+      });
+    }
+
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => showTab(button.dataset.tab));
+    });
+
+    const chatForms = document.querySelectorAll('.chat-form');
+    chatForms.forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const textarea = form.querySelector('textarea');
+        const message = textarea.value.trim();
+        if (!message) return;
+
+        const chatLog = form.parentElement.querySelector('.chat-log');
+        const userMessage = document.createElement('div');
+        userMessage.className = 'message user';
+        userMessage.innerHTML = `<span class="role">You</span><p>${message}</p>`;
+        chatLog.appendChild(userMessage);
+
+        const pending = document.createElement('div');
+        pending.className = 'message assistant pending';
+        pending.innerHTML = '<span class="role">Assistant</span><p>Awaiting response from ChatGPT API...</p>';
+        chatLog.appendChild(pending);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        textarea.value = '';
+      });
+    });
+  </script>
 </body>
 </html>
