@@ -28,6 +28,71 @@
         Export options will allow the team to share updates with partners and align future iterations with the strategic roadmap introduced in the research.
       </p>
     </section>
+    <section class="report-stage-summaries">
+      <h2>Workspace Dialogue Summaries</h2>
+      <p class="section-intro">
+        Each card captures the distilled insights from the ChatGPT-assisted exchanges logged in the workspace. Mark a stage as complete to update the corresponding summary.
+      </p>
+      <div class="summary-grid" id="stage-summary-grid" aria-live="polite"></div>
+    </section>
   </main>
+  <script>
+    (function () {
+      const STORAGE_PREFIX = 'ppss';
+      const SUMMARY_KEY = (stage) => `${STORAGE_PREFIX}-summary-${stage}`;
+      const stageDefinitions = [
+        { id: 'problem-definition', title: 'Problem Definition' },
+        { id: 'data-analysis', title: 'Data Analysis' },
+        { id: 'design-alternatives', title: 'Design/Plan Alternatives' },
+        { id: 'design-evaluation', title: 'Design/Plan Evaluation' }
+      ];
+
+      function parseSummary(stageId) {
+        try {
+          const stored = localStorage.getItem(SUMMARY_KEY(stageId));
+          return stored ? JSON.parse(stored) : null;
+        } catch (error) {
+          console.warn('Unable to load summary for', stageId, error);
+          return null;
+        }
+      }
+
+      function buildCard(stage) {
+        const summaryInfo = parseSummary(stage.id);
+        const card = document.createElement('article');
+        card.className = `summary-card${summaryInfo ? ' ready' : ' empty'}`;
+
+        const heading = document.createElement('h3');
+        heading.textContent = stage.title;
+        card.appendChild(heading);
+
+        const content = document.createElement('p');
+        content.className = 'summary-body';
+
+        if (summaryInfo && summaryInfo.summary) {
+          content.textContent = summaryInfo.summary;
+        } else {
+          content.textContent = 'No summary has been published yet. Complete the stage in the workspace to surface insights here.';
+        }
+
+        card.appendChild(content);
+
+        if (summaryInfo && summaryInfo.timestamp) {
+          const timestamp = document.createElement('p');
+          timestamp.className = 'summary-timestamp';
+          const updatedAt = new Date(summaryInfo.timestamp);
+          timestamp.textContent = `Updated ${updatedAt.toLocaleString()}`;
+          card.appendChild(timestamp);
+        }
+
+        return card;
+      }
+
+      const grid = document.getElementById('stage-summary-grid');
+      stageDefinitions.forEach((stage) => {
+        grid.appendChild(buildCard(stage));
+      });
+    })();
+  </script>
 </body>
 </html>
