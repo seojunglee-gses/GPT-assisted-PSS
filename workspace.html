@@ -55,6 +55,13 @@
         </button>
       </div>
 
+      <div class="stage-progress" aria-hidden="true">
+        <div class="stage-progress__track">
+          <div class="stage-progress__fill" style="width: 0%"></div>
+        </div>
+        <span class="stage-progress__label">Stage 1 of 5</span>
+      </div>
+
       <div class="stage-container">
         <article id="problem-definition" class="stage-content active" role="tabpanel">
           <div class="stage-grid">
@@ -95,8 +102,11 @@
               </div>
               <form class="chat-form" aria-label="Send a message to ChatGPT" data-stage="problem-definition">
                 <label class="visually-hidden" for="message-stage-1">Message</label>
-                <textarea id="message-stage-1" name="message" rows="3" placeholder="Compose your prompt..." required></textarea>
-                <button type="submit">Send to ChatGPT API</button>
+                <div class="chat-composer">
+                  <input id="message-stage-1" class="chat-input" type="text" name="message"
+                    placeholder="Compose your prompt..." required />
+                  <button type="submit" class="chat-send" aria-label="Send message">Send</button>
+                </div>
               </form>
               <div class="stage-actions">
                 <button type="button" class="complete-stage" data-stage="problem-definition">Complete Stage</button>
@@ -159,9 +169,11 @@
               </div>
               <form class="chat-form" aria-label="Send a message to ChatGPT" data-stage="data-analysis">
                 <label class="visually-hidden" for="message-stage-2">Message</label>
-                <textarea id="message-stage-2" name="message" rows="3"
-                  placeholder="Ask about anomalies, clusters, or correlations..." required></textarea>
-                <button type="submit">Send to ChatGPT API</button>
+                <div class="chat-composer">
+                  <input id="message-stage-2" class="chat-input" type="text" name="message"
+                    placeholder="Ask about anomalies, clusters, or correlations..." required />
+                  <button type="submit" class="chat-send" aria-label="Send message">Send</button>
+                </div>
               </form>
               <div class="stage-actions">
                 <button type="button" class="complete-stage" data-stage="data-analysis">Complete Stage</button>
@@ -214,9 +226,11 @@
               </div>
               <form class="chat-form" aria-label="Send a message to ChatGPT" data-stage="design-alternatives">
                 <label class="visually-hidden" for="message-stage-3">Message</label>
-                <textarea id="message-stage-3" name="message" rows="3" placeholder="Describe a new alternative..."
-                  required></textarea>
-                <button type="submit">Send to ChatGPT API</button>
+                <div class="chat-composer">
+                  <input id="message-stage-3" class="chat-input" type="text" name="message"
+                    placeholder="Describe a new alternative..." required />
+                  <button type="submit" class="chat-send" aria-label="Send message">Send</button>
+                </div>
               </form>
               <div class="stage-actions">
                 <button type="button" class="complete-stage" data-stage="design-alternatives">Complete Stage</button>
@@ -263,9 +277,11 @@
               </div>
               <form class="chat-form" aria-label="Send a message to ChatGPT" data-stage="design-evaluation">
                 <label class="visually-hidden" for="message-stage-4">Message</label>
-                <textarea id="message-stage-4" name="message" rows="3"
-                  placeholder="Request comparative evaluations or metrics..." required></textarea>
-                <button type="submit">Send to ChatGPT API</button>
+                <div class="chat-composer">
+                  <input id="message-stage-4" class="chat-input" type="text" name="message"
+                    placeholder="Request comparative evaluations or metrics..." required />
+                  <button type="submit" class="chat-send" aria-label="Send message">Send</button>
+                </div>
               </form>
               <div class="stage-actions">
                 <button type="button" class="complete-stage" data-stage="design-evaluation">Complete Stage</button>
@@ -343,6 +359,9 @@
       const tabButtons = Array.from(document.querySelectorAll('.data-tab'));
       const tabPanels = Array.from(document.querySelectorAll('.data-tab-content'));
       const completeButtons = Array.from(document.querySelectorAll('.complete-stage'));
+      const progressFill = document.querySelector('.stage-progress__fill');
+      const progressLabel = document.querySelector('.stage-progress__label');
+      const stageCount = stageButtons.length || 1;
       const STORAGE_PREFIX = 'ppss';
       const CONVERSATION_KEY = (stage) => `${STORAGE_PREFIX}-conversation-${stage}`;
       const SUMMARY_KEY = (stage) => `${STORAGE_PREFIX}-summary-${stage}`;
@@ -418,6 +437,15 @@
           panel.classList.toggle('active', shouldShow);
           panel.toggleAttribute('hidden', !shouldShow);
         });
+
+        if (progressFill) {
+          const percent = stageCount > 1 ? (index / (stageCount - 1)) * 100 : 100;
+          progressFill.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+        }
+
+        if (progressLabel) {
+          progressLabel.textContent = `Stage ${index + 1} of ${stageCount}`;
+        }
       }
 
       stageButtons.forEach((button, index) => {
@@ -591,10 +619,10 @@
       function handleChatSubmit(event) {
         event.preventDefault();
         const form = event.currentTarget;
-        const textarea = form.querySelector('textarea');
-        const message = textarea.value.trim();
+        const input = form.querySelector('.chat-input');
+        const message = input.value.trim();
         if (!message) return;
-        textarea.value = '';
+        input.value = '';
 
         const stage = form.dataset.stage;
         const stageInfo = stageConfig[stage];
@@ -630,6 +658,8 @@
       });
 
       updateStageCompletionStyles();
+      const defaultIndex = stageButtons.findIndex((button) => button.classList.contains('active'));
+      showStage(defaultIndex >= 0 ? defaultIndex : 0);
       Object.keys(stageConfig).forEach((stage) => {
         const summaryInfo = parseStoredJSON(SUMMARY_KEY(stage), null);
         if (summaryInfo && summaryInfo.summary) {
