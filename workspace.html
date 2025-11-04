@@ -996,7 +996,7 @@
               content: `${stageInfo.summaryPrompt}\n\nDialogue:\n${conversationTranscript}`
             }
           ];
-          const completion = await callChatGPT(messages, { model: 'gpt-4o-mini' });
+          const completion = await callChatGPT(messages, { model: 'gpt-4o' });
           summaryText = completion.error ? fallbackSummary(stage, conversation) : completion.content;
         } else {
           summaryText = fallbackSummary(stage, conversation);
