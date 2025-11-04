@@ -279,16 +279,35 @@ section {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  max-width: 75%;
+  box-shadow: 0 6px 18px rgba(47, 79, 111, 0.08);
+}
+
+.message.assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--accent-light);
+}
+
+.message.user {
+  align-self: flex-end;
+  background: var(--accent-bright);
+  color: #ffffff;
 }
 
 .message .role {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: inherit;
+  opacity: 0.8;
 }
 
 .message.user .role {
-  color: #4c7bb5;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .message p {
