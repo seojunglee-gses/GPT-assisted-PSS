@@ -419,13 +419,13 @@
                     <span>Assign a rank</span>
                     <select id="rank-community-lab" class="ranking-select" data-image-id="community-lab">
                       <option value="">Unranked</option>
-                      <option value="1">Rank 1 — Leading Concept</option>
-                      <option value="2">Rank 2 — Strong Contender</option>
-                      <option value="3">Rank 3 — Needs Refinement</option>
-                      <option value="4">Rank 4 — Backup Option</option>
-                      <option value="5">Rank 5 — Limited Fit</option>
-                      <option value="6">Rank 6 — Low Alignment</option>
-                      <option value="7">Rank 7 — Retire Concept</option>
+                      <option value="1">Rank 1 </option>
+                      <option value="2">Rank 2 </option>
+                      <option value="3">Rank 3 </option>
+                      <option value="4">Rank 4 </option>
+                      <option value="5">Rank 5 </option>
+                      <option value="6">Rank 6 </option>
+                      <option value="7">Rank 7 </option>
                     </select>
                   </label>
                 </figure>
@@ -925,7 +925,7 @@
               Authorization: `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-              model: options.model || 'gpt-4o-mini',
+              model: options.model || 'gpt-4o',
               messages,
               temperature: 0.4
             })
