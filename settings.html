@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | ChatGPT-assisted PPSS Platform</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="logo">PPSS</div>
+    <ul>
+      <li><a href="index.html"><span class="icon">🏠</span><span>Home</span></a></li>
+      <li><a href="workspace.html"><span class="icon">🧠</span><span>Workspace</span></a></li>
+      <li><a href="report.html"><span class="icon">📊</span><span>Report</span></a></li>
+      <li><a href="settings.html" class="active"><span class="icon">⚙️</span><span>Settings</span></a></li>
+    </ul>
+  </nav>
+  <main class="content">
+    <header>
+      <h1>Platform Settings</h1>
+    </header>
+    <section>
+      <p>
+        Configure access levels, integrate organizational data sources, and tailor the conversational tone of ChatGPT to match the domain expertise required in proactive PPSS development.
+      </p>
+      <p>
+        Personalization ensures that analytics dashboards, co-design templates, and notification routines align with the operational context presented in the study.
+      </p>
+    </section>
+    <section class="settings-card">
+      <h2>ChatGPT API Access</h2>
+      <p>
+        Store an OpenAI API key locally to unlock live completions throughout the workspace stages. The key is only saved in your browser and can be cleared at any time.
+      </p>
+      <form id="api-key-form" class="settings-form">
+        <label for="openai-api-key">OpenAI API Key</label>
+        <input type="password" id="openai-api-key" name="openai-api-key" placeholder="sk-..." autocomplete="off" />
+        <div class="form-actions">
+          <button type="submit">Save Key</button>
+          <button type="button" id="clear-api-key" class="secondary">Clear Key</button>
+        </div>
+        <p class="form-status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const STORAGE_PREFIX = 'ppss';
+      const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
+      const form = document.getElementById('api-key-form');
+      const input = document.getElementById('openai-api-key');
+      const clearButton = document.getElementById('clear-api-key');
+      const status = form.querySelector('.form-status');
+
+      function setStatus(message, tone = '') {
+        status.textContent = message;
+        status.className = `form-status ${tone}`.trim();
+      }
+
+      function hydrate() {
+        const stored = localStorage.getItem(API_KEY_STORAGE);
+        input.value = stored ? stored : '';
+        setStatus(stored ? 'An API key is currently stored in this browser.' : '');
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const key = input.value.trim();
+        if (!key) {
+          setStatus('Enter a valid API key before saving.', 'warning');
+          return;
+        }
+        localStorage.setItem(API_KEY_STORAGE, key);
+        setStatus('API key saved locally. Workspace chats can now request live completions.', 'success');
+      });
+
+      clearButton.addEventListener('click', () => {
+        localStorage.removeItem(API_KEY_STORAGE);
+        input.value = '';
+        setStatus('API key removed from this browser.', 'warning');
+      });
+
+      hydrate();
+    })();
+  </script>
+</body>
+</html>
