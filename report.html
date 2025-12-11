@@ -27,6 +27,9 @@
       <p>
         Export options will allow the team to share updates with partners and align future iterations with the strategic roadmap introduced in the research.
       </p>
+      <p class="workspace-meta" id="report-workspace-meta" hidden>
+        Viewing reports for workspace code: <span class="workspace-code-emphasis" id="report-workspace-code"></span>
+      </p>
     </section>
     <section class="report-overview">
       <h2>Integrated Dialogue Summary</h2>
@@ -55,10 +58,48 @@
   <script>
     (function () {
       const STORAGE_PREFIX = 'ppss';
-      const SUMMARY_KEY = (stage) => `${STORAGE_PREFIX}-summary-${stage}`;
-      const CONVERSATION_KEY = (stage) => `${STORAGE_PREFIX}-conversation-${stage}`;
-      const AGGREGATE_KEY = `${STORAGE_PREFIX}-summary-aggregate`;
-      const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
+      const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
+
+      const params = new URLSearchParams(window.location.search);
+      let workspaceId = params.get('code');
+      if (workspaceId) {
+        workspaceId = workspaceId.trim();
+        if (workspaceId) {
+          localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
+        }
+      }
+
+      if (!workspaceId) {
+        const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+        workspaceId = stored ? stored.trim() : '';
+      }
+
+      if (!workspaceId) {
+        window.location.replace('index.html?login=required');
+        return;
+      }
+
+      if (params.has('code')) {
+        params.delete('code');
+        const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      const workspaceKeySegment = encodeURIComponent(workspaceId);
+      const WORKSPACE_PREFIX = `${STORAGE_PREFIX}-workspace-${workspaceKeySegment}`;
+      const SUMMARY_KEY = (stage) => `${WORKSPACE_PREFIX}-summary-${stage}`;
+      const CONVERSATION_KEY = (stage) => `${WORKSPACE_PREFIX}-conversation-${stage}`;
+      const AGGREGATE_KEY = `${WORKSPACE_PREFIX}-summary-aggregate`;
+      const API_KEY_STORAGE = `${WORKSPACE_PREFIX}-openai-key`;
+
+      const workspaceMeta = document.getElementById('report-workspace-meta');
+      const workspaceCodeDisplay = document.getElementById('report-workspace-code');
+      if (workspaceCodeDisplay) {
+        workspaceCodeDisplay.textContent = workspaceId;
+      }
+      if (workspaceMeta) {
+        workspaceMeta.hidden = false;
+      }
       const stageDefinitions = [
         { id: 'problem-definition', title: 'Problem Definition' },
         { id: 'data-analysis', title: 'Data Analysis' },

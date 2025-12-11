@@ -27,61 +27,59 @@
       <p>
         Personalization ensures that analytics dashboards, co-design templates, and notification routines align with the operational context presented in the study.
       </p>
+      <p class="workspace-meta" id="settings-workspace-meta" hidden>
+        Managing settings for workspace code: <span class="workspace-code-emphasis" id="settings-workspace-code"></span>
+      </p>
     </section>
     <section class="settings-card">
       <h2>ChatGPT API Access</h2>
       <p>
-        Store an OpenAI API key locally to unlock live completions throughout the workspace stages. The key is only saved in your browser and can be cleared at any time.
+        API connectivity is now handled on the backend for each workspace. Provide your credentials in the server configuration so the frontend can call the proxy without storing keys in the browser.
       </p>
-      <form id="api-key-form" class="settings-form">
-        <label for="openai-api-key">OpenAI API Key</label>
-        <input type="password" id="openai-api-key" name="openai-api-key" placeholder="sk-..." autocomplete="off" />
-        <div class="form-actions">
-          <button type="submit">Save Key</button>
-          <button type="button" id="clear-api-key" class="secondary">Clear Key</button>
-        </div>
-        <p class="form-status" aria-live="polite"></p>
-      </form>
+      <p class="form-status info" aria-live="polite">
+        Tip: update the backend request handler to inject the correct OpenAI or Azure OpenAI credentials for the active workspace.
+      </p>
     </section>
   </main>
   <script>
     (function () {
       const STORAGE_PREFIX = 'ppss';
-      const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
-      const form = document.getElementById('api-key-form');
-      const input = document.getElementById('openai-api-key');
-      const clearButton = document.getElementById('clear-api-key');
-      const status = form.querySelector('.form-status');
+      const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
 
-      function setStatus(message, tone = '') {
-        status.textContent = message;
-        status.className = `form-status ${tone}`.trim();
-      }
-
-      function hydrate() {
-        const stored = localStorage.getItem(API_KEY_STORAGE);
-        input.value = stored ? stored : '';
-        setStatus(stored ? 'An API key is currently stored in this browser.' : '');
-      }
-
-      form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const key = input.value.trim();
-        if (!key) {
-          setStatus('Enter a valid API key before saving.', 'warning');
-          return;
+      const params = new URLSearchParams(window.location.search);
+      let workspaceId = params.get('code');
+      if (workspaceId) {
+        workspaceId = workspaceId.trim();
+        if (workspaceId) {
+          localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
         }
-        localStorage.setItem(API_KEY_STORAGE, key);
-        setStatus('API key saved locally. Workspace chats can now request live completions.', 'success');
-      });
+      }
 
-      clearButton.addEventListener('click', () => {
-        localStorage.removeItem(API_KEY_STORAGE);
-        input.value = '';
-        setStatus('API key removed from this browser.', 'warning');
-      });
+      if (!workspaceId) {
+        const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+        workspaceId = stored ? stored.trim() : '';
+      }
 
-      hydrate();
+      if (!workspaceId) {
+        window.location.replace('index.html?login=required');
+        return;
+      }
+
+      if (params.has('code')) {
+        params.delete('code');
+        const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+      }
+
+      const workspaceKeySegment = encodeURIComponent(workspaceId);
+      const workspaceMeta = document.getElementById('settings-workspace-meta');
+      const workspaceCodeDisplay = document.getElementById('settings-workspace-code');
+      if (workspaceCodeDisplay) {
+        workspaceCodeDisplay.textContent = workspaceId;
+      }
+      if (workspaceMeta) {
+        workspaceMeta.hidden = false;
+      }
     })();
   </script>
 </body>
