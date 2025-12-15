@@ -10,10 +10,36 @@
   <nav class="sidebar">
     <div class="logo">PPSS</div>
     <ul>
-      <li><a href="index.html"><span class="icon">🏠</span><span>Home</span></a></li>
-      <li><a href="workspace.html" class="active"><span class="icon">🧠</span><span>Workspace</span></a></li>
-      <li><a href="report.html"><span class="icon">📊</span><span>Report</span></a></li>
-      <li><a href="settings.html"><span class="icon">⚙️</span><span>Settings</span></a></li>
+      <li><a href="index.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
+            </svg>
+          </span>
+          <span class="nav-label">Home</span></a></li>
+      <li><a href="workspace.html" class="active">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" />
+            </svg>
+          </span>
+          <span class="nav-label">Workspace</span></a></li>
+      <li><a href="report.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M6 20v-7m6 7V7m6 13v-4" />
+              <path d="M5 13h2m4-6h2m4 9h2" />
+            </svg>
+          </span>
+          <span class="nav-label">Report</span></a></li>
+      <li><a href="settings.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path
+                d="M12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Zm8 2.5a8.05 8.05 0 0 0-.11-1.3l1.76-1.37-1.5-2.6-2.1.65a8 8 0 0 0-2.24-1.3l-.27-2.18h-3l-.27 2.18a8 8 0 0 0-2.24 1.3l-2.1-.65-1.5 2.6 1.76 1.37A8.05 8.05 0 0 0 4 12.5c0 .44.04.87.11 1.3l-1.76 1.37 1.5 2.6 2.1-.65a8 8 0 0 0 2.24 1.3l.27 2.18h3l.27-2.18a8 8 0 0 0 2.24-1.3l2.1.65 1.5-2.6-1.76-1.37c.07-.43.11-.86.11-1.3Z" />
+            </svg>
+          </span>
+          <span class="nav-label">Settings</span></a></li>
     </ul>
   </nav>
   <main class="content workspace-main">
@@ -28,27 +54,52 @@
       <div class="stage-navigation" role="tablist" aria-label="Workspace stages">
         <button type="button" class="stage-step active" data-stage="problem-definition" data-index="0" role="tab"
           aria-selected="true">
-          <span class="step-icon">🧭</span>
+          <span class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16Z" />
+              <path d="m10 14 1-3 3-1-1 3z" />
+            </svg>
+          </span>
           <span class="step-label">Problem Definition</span>
         </button>
         <button type="button" class="stage-step" data-stage="data-analysis" data-index="1" role="tab"
           aria-selected="false">
-          <span class="step-icon">📊</span>
+          <span class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 18v-6m6 6V6m6 12v-4" />
+              <path d="M5 12h2m4-6h2m4 8h2" />
+            </svg>
+          </span>
           <span class="step-label">Data Analysis</span>
         </button>
         <button type="button" class="stage-step" data-stage="design-alternatives" data-index="2" role="tab"
           aria-selected="false">
-          <span class="step-icon">🛠️</span>
+          <span class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M9.5 3.5 7 6l2 2-4 4-2-2-2 2 6 6 2-2-2-2 4-4 2 2 2.5-2.5" />
+              <path d="m15 3 6 6" />
+            </svg>
+          </span>
           <span class="step-label">Design/Plan Alternatives</span>
         </button>
         <button type="button" class="stage-step" data-stage="design-evaluation" data-index="3" role="tab"
           aria-selected="false">
-          <span class="step-icon">🔍</span>
+          <span class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="6" />
+              <path d="m15.5 15.5 3 3" />
+            </svg>
+          </span>
           <span class="step-label">Design/Plan Evaluation</span>
         </button>
         <button type="button" class="stage-step" data-stage="design-decision" data-index="4" role="tab"
           aria-selected="false">
-          <span class="step-icon">📑</span>
+          <span class="step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M7 4h7l5 5v11H7z" />
+              <path d="M14 4v5h5" />
+            </svg>
+          </span>
           <span class="step-label">Design/Plan Decision</span>
         </button>
       </div>
@@ -1105,8 +1156,17 @@
       }
 
       const rankingSelects = Array.from(document.querySelectorAll('.ranking-select'));
-      const decisionRows = Array.from(document.querySelectorAll('.decision-table tbody tr[data-image-id]'));
       const chartRows = Array.from(document.querySelectorAll('.preference-chart__row[data-image-id]'));
+      const pieChart = document.querySelector('.preference-pie');
+      const pieEmptyMessage = pieChart?.querySelector('.pie-chart__empty');
+      const pieLegendItems = Array.from(document.querySelectorAll('.pie-chart__legend-item[data-image-id]'));
+      const pieLegendMap = pieLegendItems.reduce((acc, item) => {
+        const { imageId } = item.dataset || {};
+        if (imageId) {
+          acc[imageId] = item;
+        }
+        return acc;
+      }, {});
       const leaderCard = document.querySelector('.leader-card');
       const leaderPlaceholder = document.querySelector('.leader-placeholder');
       const leaderImage = leaderCard?.querySelector('img');
@@ -1131,16 +1191,14 @@
         };
       });
 
-      decisionRows.forEach((row) => {
-        const { imageId } = row.dataset;
+      chartRows.forEach((row) => {
+        const { imageId, title, contributor } = row.dataset;
         if (!imageId) return;
-        const titleCell = row.querySelector('th');
-        const cells = Array.from(row.querySelectorAll('td'));
-        const contributorCell = cells[0];
+        const labelTitle = row.querySelector('.label-title')?.textContent?.trim();
         conceptMetadata[imageId] = {
           ...(conceptMetadata[imageId] || {}),
-          title: titleCell?.textContent?.trim() || conceptMetadata[imageId]?.title || '',
-          contributor: contributorCell?.textContent?.trim() || conceptMetadata[imageId]?.contributor || ''
+          title: title || labelTitle || conceptMetadata[imageId]?.title || '',
+          contributor: contributor || conceptMetadata[imageId]?.contributor || ''
         };
       });
 
@@ -1178,32 +1236,47 @@
         };
       }
 
-      function updateDecisionTable() {
-        decisionRows.forEach((row) => {
-          const { imageId } = row.dataset;
-          const rankCell = row.querySelector('.decision-rank');
-          const preferenceCell = row.querySelector('.decision-preference');
-          if (!imageId || !rankCell || !preferenceCell) return;
+      function renderPieChart(segments) {
+        if (!pieChart) return;
+        const totalScore = segments.reduce((sum, segment) => sum + segment.score, 0);
 
-          const storedRank = rankingStore[imageId];
-          const preferenceInfo = computePreference(storedRank);
-          rankCell.textContent = preferenceInfo.rankText;
-
-          const meter = preferenceCell.querySelector('.preference-meter span');
-          const label = preferenceCell.querySelector('.preference-label');
-
-          if (meter) {
-            meter.style.width = preferenceInfo.width;
+        if (totalScore <= 0) {
+          pieChart.classList.add('is-empty');
+          pieChart.style.setProperty('--pie-background', 'conic-gradient(var(--pie-empty-color) 0deg 360deg)');
+          pieChart.setAttribute('aria-label', 'Preference share awaiting rankings');
+          if (pieEmptyMessage) {
+            pieEmptyMessage.removeAttribute('hidden');
           }
+          return;
+        }
 
-          if (label) {
-            label.textContent = preferenceInfo.label;
-          }
+        let progress = 0;
+        const gradientStops = segments.map((segment) => {
+          const { legendItem } = segment;
+          const rawColor = legendItem
+            ? getComputedStyle(legendItem).getPropertyValue('--segment-color').trim()
+            : '';
+          const color = rawColor || 'var(--accent-light)';
+          const start = progress;
+          const fraction = segment.score / totalScore;
+          progress += fraction;
+          const end = progress;
+          const startDeg = `${(start * 360).toFixed(2)}deg`;
+          const endDeg = `${(end * 360).toFixed(2)}deg`;
+          return `${color} ${startDeg} ${endDeg}`;
         });
+
+        pieChart.classList.remove('is-empty');
+        pieChart.style.setProperty('--pie-background', `conic-gradient(${gradientStops.join(', ')})`);
+        pieChart.setAttribute('aria-label', 'Preference share across evaluated concepts');
+        if (pieEmptyMessage) {
+          pieEmptyMessage.setAttribute('hidden', '');
+        }
       }
 
       function updateDecisionInsights() {
         let topConcept = null;
+        const pieSegments = [];
 
         chartRows.forEach((row) => {
           const { imageId } = row.dataset;
@@ -1226,6 +1299,24 @@
 
           row.classList.toggle('is-ranked', Boolean(storedRank));
 
+          const legendItem = pieLegendMap[imageId];
+          if (legendItem) {
+            const legendValue = legendItem.querySelector('.legend-value');
+            if (legendValue) {
+              legendValue.textContent = storedRank
+                ? `${preferenceInfo.rankText} · ${preferenceInfo.percent}% affinity`
+                : 'Awaiting evaluation';
+            }
+            legendItem.classList.toggle('is-ranked', Boolean(storedRank));
+          }
+
+          pieSegments.push({
+            imageId,
+            score: Math.max(0, preferenceInfo.score),
+            legendItem,
+            info: preferenceInfo
+          });
+
           if (storedRank) {
             const meta = conceptMetadata[imageId] || {};
             const score = preferenceInfo.score;
@@ -1244,6 +1335,8 @@
             }
           }
         });
+
+        renderPieChart(pieSegments);
 
         if (topConcept && topConcept.rank) {
           if (leaderPlaceholder) {
@@ -1331,12 +1424,10 @@
             updateRankingBadge(figure, value);
           }
           persistRankings();
-          updateDecisionTable();
           updateDecisionInsights();
         });
       });
 
-      updateDecisionTable();
       updateDecisionInsights();
 
       function showTab(id) {
