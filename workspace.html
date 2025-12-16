@@ -1155,6 +1155,22 @@
         localStorage.setItem(RANKING_KEY, JSON.stringify(rankingStore));
       }
 
+      function harvestRankingSelections() {
+        rankingSelects.forEach((select) => {
+          const { imageId } = select.dataset;
+          if (!imageId) return;
+          if (select.value) {
+            rankingStore[imageId] = select.value;
+          } else {
+            delete rankingStore[imageId];
+          }
+          const figure = document.querySelector(`.evaluation-photo[data-image-id="${imageId}"]`);
+          if (figure) {
+            updateRankingBadge(figure, select.value);
+          }
+        });
+      }
+
       const rankingSelects = Array.from(document.querySelectorAll('.ranking-select'));
       const chartRows = Array.from(document.querySelectorAll('.preference-chart__row[data-image-id]'));
       const pieChart = document.querySelector('.preference-pie');
@@ -1430,6 +1446,25 @@
 
       updateDecisionInsights();
 
+      const saveRankingButtons = Array.from(document.querySelectorAll('.save-rankings'));
+
+      saveRankingButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          harvestRankingSelections();
+          persistRankings();
+          updateDecisionInsights();
+          setStageStatus('design-evaluation', 'Evaluation rankings saved and synced to the decision view.', 'success');
+          setStageStatus('design-decision', 'Decision insights updated from your saved rankings.', 'success');
+          const nextStage = button.dataset.nextStage;
+          if (nextStage) {
+            const targetIndex = stageButtons.findIndex((btn) => btn.dataset.stage === nextStage);
+            if (targetIndex >= 0) {
+              showStage(targetIndex);
+            }
+          }
+        });
+      });
+
       function showTab(id) {
         tabButtons.forEach((btn) => {
           const isActive = btn.dataset.tab === id;
@@ -1460,7 +1495,7 @@
         const message = document.createElement('div');
         message.className = `message ${role}${options.pending ? ' pending' : ''}`;
         const roleLabel =
-          role === 'assistant' ? 'ChatGPT' : role === 'system' ? 'System' : 'Resident';
+          role === 'assistant' ? 'ChatGPT' : role === 'system' ? 'System' : 'Designer';
         const roleSpan = document.createElement('span');
         roleSpan.className = 'role';
         roleSpan.textContent = roleLabel;

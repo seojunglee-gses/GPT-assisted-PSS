@@ -670,6 +670,47 @@ section {
   color: var(--muted);
 }
 
+.save-rankings-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: linear-gradient(90deg, #f1f5ff 0%, #f6f9ff 100%);
+  border: 1px solid var(--accent-light);
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  margin: 1rem 0;
+}
+
+.save-rankings-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  color: var(--text-subtle);
+}
+
+.save-rankings-copy strong {
+  color: var(--text-primary);
+}
+
+.save-rankings {
+  border: none;
+  background: var(--accent-bright);
+  color: #fff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 10px 24px rgba(14, 56, 180, 0.25);
+}
+
+.save-rankings:hover,
+.save-rankings:focus-visible {
+  transform: translateY(-1px);
+  background: var(--accent-dark);
+}
+
 .evaluation-photo .photo-wrapper {
   position: relative;
   border-radius: 1rem;
