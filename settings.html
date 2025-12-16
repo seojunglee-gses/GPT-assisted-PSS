@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings | ChatGPT-assisted PPSS Platform</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="logo">PPSS</div>
+    <ul>
+      <li><a href="index.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-5h-4v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
+            </svg>
+          </span>
+          <span class="nav-label">Home</span></a></li>
+      <li><a href="workspace.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z" />
+            </svg>
+          </span>
+          <span class="nav-label">Workspace</span></a></li>
+      <li><a href="report.html">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path d="M6 20v-7m6 7V7m6 13v-4" />
+              <path d="M5 13h2m4-6h2m4 9h2" />
+            </svg>
+          </span>
+          <span class="nav-label">Report</span></a></li>
+      <li><a href="settings.html" class="active">
+          <span class="icon-circle" aria-hidden="true">
+            <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+              <path
+                d="M12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5Zm8 2.5a8.05 8.05 0 0 0-.11-1.3l1.76-1.37-1.5-2.6-2.1.65a8 8 0 0 0-2.24-1.3l-.27-2.18h-3l-.27 2.18a8 8 0 0 0-2.24 1.3l-2.1-.65-1.5 2.6 1.76 1.37A8.05 8.05 0 0 0 4 12.5c0 .44.04.87.11 1.3l-1.76 1.37 1.5 2.6 2.1-.65a8 8 0 0 0 2.24 1.3l.27 2.18h3l.27-2.18a8 8 0 0 0 2.24-1.3l2.1.65 1.5-2.6-1.76-1.37c.07-.43.11-.86.11-1.3Z" />
+            </svg>
+          </span>
+          <span class="nav-label">Settings</span></a></li>
+    </ul>
+  </nav>
+  <main class="content">
+    <header>
+      <h1>Platform Settings</h1>
+    </header>
+    <section>
+      <p>
+        Configure access levels, integrate organizational data sources, and tailor the conversational tone of ChatGPT to match the domain expertise required in proactive PPSS development.
+      </p>
+      <p>
+        Personalization ensures that analytics dashboards, co-design templates, and notification routines align with the operational context presented in the study.
+      </p>
+    </section>
+    <section class="settings-card">
+      <h2>ChatGPT API Access</h2>
+      <p>
+        Store an OpenAI API key locally to unlock live completions throughout the workspace stages. The key is only saved in your browser and can be cleared at any time.
+      </p>
+      <form id="api-key-form" class="settings-form">
+        <label for="openai-api-key">OpenAI API Key</label>
+        <input type="password" id="openai-api-key" name="openai-api-key" placeholder="sk-..." autocomplete="off" />
+        <div class="form-actions">
+          <button type="submit">Save Key</button>
+          <button type="button" id="clear-api-key" class="secondary">Clear Key</button>
+        </div>
+        <p class="form-status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <script>
+    (function () {
+      const STORAGE_PREFIX = 'ppss';
+      const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
+      const form = document.getElementById('api-key-form');
+      const input = document.getElementById('openai-api-key');
+      const clearButton = document.getElementById('clear-api-key');
+      const status = form.querySelector('.form-status');
+
+      function setStatus(message, tone = '') {
+        status.textContent = message;
+        status.className = `form-status ${tone}`.trim();
+      }
+
+      function hydrate() {
+        const stored = localStorage.getItem(API_KEY_STORAGE);
+        input.value = stored ? stored : '';
+        setStatus(stored ? 'An API key is currently stored in this browser.' : '');
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const key = input.value.trim();
+        if (!key) {
+          setStatus('Enter a valid API key before saving.', 'warning');
+          return;
+        }
+        localStorage.setItem(API_KEY_STORAGE, key);
+        setStatus('API key saved locally. Workspace chats can now request live completions.', 'success');
+      });
+
+      clearButton.addEventListener('click', () => {
+        localStorage.removeItem(API_KEY_STORAGE);
+        input.value = '';
+        setStatus('API key removed from this browser.', 'warning');
+      });
+
+      hydrate();
+    })();
+  </script>
+</body>
+</html>
