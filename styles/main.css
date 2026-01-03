@@ -90,6 +90,94 @@ section {
   font-size: 1.05rem;
 }
 
+.workspace-login {
+  margin-top: 2.5rem;
+  padding: 2rem;
+  background: var(--surface);
+  border-radius: 1.2rem;
+  border: 1px solid var(--accent-light);
+  box-shadow: 0 10px 30px rgba(47, 79, 111, 0.08);
+}
+
+.workspace-login h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.login-form label {
+  font-weight: 600;
+}
+
+.login-input-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.login-input-group input {
+  flex: 1 1 220px;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.9rem;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-input-group input:focus {
+  outline: none;
+  border-color: var(--accent-bright);
+  box-shadow: 0 0 0 3px rgba(76, 123, 181, 0.25);
+}
+
+.login-input-group button {
+  padding: 0.85rem 1.4rem;
+  border-radius: 0.9rem;
+  background: var(--accent-bright);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.login-input-group button:hover {
+  background: #2f5c8f;
+}
+
+.login-input-group button:active {
+  transform: translateY(1px);
+}
+
+.login-feedback {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.login-feedback.error {
+  color: #b03a2e;
+}
+
+.login-feedback.success {
+  color: #1e8449;
+}
+
+.workspace-meta {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.workspace-code-emphasis {
+  font-weight: 700;
+  color: var(--accent);
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -279,16 +367,35 @@ section {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  max-width: 75%;
+  box-shadow: 0 6px 18px rgba(47, 79, 111, 0.08);
+}
+
+.message.assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--accent-light);
+}
+
+.message.user {
+  align-self: flex-end;
+  background: var(--accent-bright);
+  color: #ffffff;
 }
 
 .message .role {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: inherit;
+  opacity: 0.8;
 }
 
 .message.user .role {
-  color: #4c7bb5;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .message p {
@@ -784,10 +891,62 @@ body.lightbox-open {
   gap: 1.25rem;
 }
 
+.settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: #eef3fb;
+}
+
+.settings-tab {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.settings-tab.active {
+  background: var(--accent-bright);
+  color: #ffffff;
+  box-shadow: 0 8px 16px rgba(60, 106, 163, 0.25);
+}
+
+.settings-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settings-panel {
+  display: none;
+}
+
+.settings-panel.active {
+  display: block;
+}
+
 .settings-form {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
 }
 
 .settings-form label {
@@ -799,6 +958,17 @@ body.lightbox-open {
   border-radius: 0.8rem;
   border: 1px solid var(--accent-light);
   font-size: 1rem;
+}
+
+.settings-form input[type='file'] {
+  padding: 0.6rem 0.85rem;
+  background: #f6f8fb;
+}
+
+.form-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
 }
 
 .form-actions {
@@ -835,6 +1005,10 @@ body.lightbox-open {
   min-height: 1.2rem;
   font-size: 0.92rem;
   color: var(--muted);
+}
+
+.form-status.info {
+  color: var(--accent);
 }
 
 .form-status.success {
