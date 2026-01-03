@@ -24,6 +24,9 @@
         dialogue powered by the ChatGPT API. Each stage below mirrors the workflow documented in the research article and
         captures the evolving intelligence of the design team.
       </p>
+      <p class="workspace-meta" id="workspace-meta" hidden>
+        Active workspace code: <span class="workspace-code-emphasis" id="workspace-code-display"></span>
+      </p>
     </header>
 
     <section class="workflow">
@@ -567,52 +570,92 @@
   </div>
 
   <script>
-    (function () {
-      const stageButtons = Array.from(document.querySelectorAll('.stage-step'));
-      const stageContents = Array.from(document.querySelectorAll('.stage-content'));
-      const tabButtons = Array.from(document.querySelectorAll('.data-tab'));
-      const tabPanels = Array.from(document.querySelectorAll('.data-tab-content'));
-      const completeButtons = Array.from(document.querySelectorAll('.complete-stage'));
-      const progressFill = document.querySelector('.stage-progress__fill');
-      const progressLabel = document.querySelector('.stage-progress__label');
-      const stageCount = stageButtons.length || 1;
-      const STORAGE_PREFIX = 'ppss';
-      const CONVERSATION_KEY = (stage) => `${STORAGE_PREFIX}-conversation-${stage}`;
-      const SUMMARY_KEY = (stage) => `${STORAGE_PREFIX}-summary-${stage}`;
-      const STATUS_KEY = `${STORAGE_PREFIX}-stage-status`;
-      const API_KEY_STORAGE = `${STORAGE_PREFIX}-openai-key`;
-      const RANKING_KEY = `${STORAGE_PREFIX}-evaluation-rankings`;
+      (function () {
+        const stageButtons = Array.from(document.querySelectorAll('.stage-step'));
+        const stageContents = Array.from(document.querySelectorAll('.stage-content'));
+        const tabButtons = Array.from(document.querySelectorAll('.data-tab'));
+        const tabPanels = Array.from(document.querySelectorAll('.data-tab-content'));
+        const completeButtons = Array.from(document.querySelectorAll('.complete-stage'));
+        const progressFill = document.querySelector('.stage-progress__fill');
+        const progressLabel = document.querySelector('.stage-progress__label');
+        const stageCount = stageButtons.length || 1;
+        const STORAGE_PREFIX = 'ppss';
+        const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
 
-      const stageConfig = {
-        'problem-definition': {
-          title: 'Problem Definition',
-          systemPrompt:
-            'You are a proactive product-service system strategist who helps teams clarify PPSS problem statements, stakeholder drivers, and sustainability intentions.',
-          summaryPrompt:
-            'Summarize the PPSS problem-definition dialogue into a short paragraph highlighting the core challenge, stakeholder commitments, and sustainability intentions.'
-        },
-        'data-analysis': {
-          title: 'Data Analysis',
-          systemPrompt:
-            'You are a PPSS data analyst who explains trends, anomalies, and correlations for mobility service transformation.',
-          summaryPrompt:
-            'Summarize the evidence interrogation by listing the most critical demand, pain point, and opportunity signals uncovered for the PPSS initiative.'
-        },
-        'design-alternatives': {
-          title: 'Design/Plan Alternatives',
-          systemPrompt:
-            'You are a PPSS co-creation assistant who compares and refines alternative service concepts with lifecycle awareness.',
-          summaryPrompt:
-            'Summarize the alternative generation dialogue, focusing on leading concepts, differentiating value, and feasibility considerations.'
-        },
-        'design-evaluation': {
-          title: 'Design/Plan Evaluation',
-          systemPrompt:
-            'You are a PPSS evaluation advisor who narrates pilot results, quantifies trade-offs, and recommends refinements.',
-          summaryPrompt:
-            'Summarize the evaluation dialogue, emphasizing tested scenarios, key metrics, and recommended refinements for scale-up.'
+        const stageConfig = {
+          'problem-definition': {
+            title: 'Problem Definition',
+            systemPrompt:
+              'You are a proactive product-service system strategist who helps teams clarify PPSS problem statements, stakeholder drivers, and sustainability intentions.',
+            summaryPrompt:
+              'Summarize the PPSS problem-definition dialogue into a short paragraph highlighting the core challenge, stakeholder commitments, and sustainability intentions.'
+          },
+          'data-analysis': {
+            title: 'Data Analysis',
+            systemPrompt:
+              'You are a PPSS data analyst who explains trends, anomalies, and correlations for mobility service transformation.',
+            summaryPrompt:
+              'Summarize the evidence interrogation by listing the most critical demand, pain point, and opportunity signals uncovered for the PPSS initiative.'
+          },
+          'design-alternatives': {
+            title: 'Design/Plan Alternatives',
+            systemPrompt:
+              'You are a PPSS co-creation assistant who compares and refines alternative service concepts with lifecycle awareness.',
+            summaryPrompt:
+              'Summarize the alternative generation dialogue, focusing on leading concepts, differentiating value, and feasibility considerations.'
+          },
+          'design-evaluation': {
+            title: 'Design/Plan Evaluation',
+            systemPrompt:
+              'You are a PPSS evaluation advisor who narrates pilot results, quantifies trade-offs, and recommends refinements.',
+            summaryPrompt:
+              'Summarize the evaluation dialogue, emphasizing tested scenarios, key metrics, and recommended refinements for scale-up.'
+          }
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        let workspaceId = params.get('code');
+        if (workspaceId) {
+          workspaceId = workspaceId.trim();
+          if (workspaceId) {
+            localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
+          }
         }
-      };
+
+        if (!workspaceId) {
+          const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+          workspaceId = stored ? stored.trim() : '';
+        }
+
+        if (!workspaceId) {
+          window.location.replace('index.html?login=required');
+          return;
+        }
+
+        if (params.has('code')) {
+          params.delete('code');
+          const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+          window.history.replaceState({}, '', newUrl);
+        }
+
+        const workspaceKeySegment = encodeURIComponent(workspaceId);
+        const WORKSPACE_PREFIX = `${STORAGE_PREFIX}-workspace-${workspaceKeySegment}`;
+        const CONVERSATION_KEY = (stage) => `${WORKSPACE_PREFIX}-conversation-${stage}`;
+        const SUMMARY_KEY = (stage) => `${WORKSPACE_PREFIX}-summary-${stage}`;
+        const STATUS_KEY = `${WORKSPACE_PREFIX}-stage-status`;
+        const RANKING_KEY = `${WORKSPACE_PREFIX}-evaluation-rankings`;
+        const CHAT_COMPLETIONS_ENDPOINT = '/api/chat';
+        const API_KEYS_KEY = `${WORKSPACE_PREFIX}-api-keys`;
+        const ACTIVE_PROVIDER_KEY = `${WORKSPACE_PREFIX}-api-provider`;
+
+        const workspaceMeta = document.getElementById('workspace-meta');
+        const workspaceCodeDisplay = document.getElementById('workspace-code-display');
+        if (workspaceCodeDisplay) {
+          workspaceCodeDisplay.textContent = workspaceId;
+        }
+        if (workspaceMeta) {
+          workspaceMeta.hidden = false;
+        }
 
       function parseStoredJSON(key, fallback) {
         try {
@@ -622,6 +665,16 @@
           console.warn('Unable to parse storage for', key, error);
           return fallback;
         }
+      }
+
+      function getActiveProvider() {
+        const stored = localStorage.getItem(ACTIVE_PROVIDER_KEY);
+        return stored ? stored.trim() : 'chatgpt';
+      }
+
+      function getApiKey(provider) {
+        const keys = parseStoredJSON(API_KEYS_KEY, {});
+        return keys[provider] ? keys[provider].trim() : '';
       }
 
       const stageStatus = parseStoredJSON(STATUS_KEY, {});
@@ -892,24 +945,29 @@
       }
 
       async function callChatGPT(messages, options = {}) {
-        const apiKey = localStorage.getItem(API_KEY_STORAGE);
-        if (!apiKey) {
-          return {
-            role: 'assistant',
-            content:
-              'Set your OpenAI API key in Settings to stream live responses. Until then, the workspace will log your prompts locally.',
-            error: true
-          };
-        }
-
         try {
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          const provider = options.provider || getActiveProvider();
+          const apiKey = getApiKey(provider);
+
+          if (!apiKey) {
+            return {
+              role: 'assistant',
+              content:
+                'No API key is configured for this workspace. Add a key in Settings to resume chat.',
+              error: true
+            };
+          }
+
+          const response = await fetch(CHAT_COMPLETIONS_ENDPOINT, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${apiKey}`
+              'X-API-Provider': provider,
+              'X-API-Key': apiKey
             },
             body: JSON.stringify({
+              provider,
+              apiKey,
               model: options.model || 'gpt-4o',
               messages,
               temperature: 0.4
@@ -932,7 +990,7 @@
           return {
             role: 'assistant',
             content:
-              'The platform could not reach the ChatGPT API. Review your API key, network access, or usage limits and try again.',
+              'The platform could not reach the ChatGPT API. Ensure the backend proxy injects valid credentials and try again.',
             error: true
           };
         }
@@ -963,29 +1021,22 @@
           return;
         }
 
-        const apiKey = localStorage.getItem(API_KEY_STORAGE);
-        let summaryText;
-
-        if (apiKey) {
-          const conversationTranscript = conversation
-            .map((entry) => `${entry.role.toUpperCase()}: ${entry.content}`)
-            .join('\n');
-          const messages = [
-            {
-              role: 'system',
-              content:
-                'You are a report automation assistant who condenses PPSS design conversations into concise, insight-rich summaries.'
-            },
-            {
-              role: 'user',
-              content: `${stageInfo.summaryPrompt}\n\nDialogue:\n${conversationTranscript}`
-            }
-          ];
-          const completion = await callChatGPT(messages, { model: 'gpt-4o-mini' });
-          summaryText = completion.error ? fallbackSummary(stage, conversation) : completion.content;
-        } else {
-          summaryText = fallbackSummary(stage, conversation);
-        }
+        const conversationTranscript = conversation
+          .map((entry) => `${entry.role.toUpperCase()}: ${entry.content}`)
+          .join('\n');
+        const messages = [
+          {
+            role: 'system',
+            content:
+              'You are a report automation assistant who condenses PPSS design conversations into concise, insight-rich summaries.'
+          },
+          {
+            role: 'user',
+            content: `${stageInfo.summaryPrompt}\n\nDialogue:\n${conversationTranscript}`
+          }
+        ];
+        const completion = await callChatGPT(messages, { model: 'gpt-4o-mini' });
+        const summaryText = completion.error ? fallbackSummary(stage, conversation) : completion.content;
 
         localStorage.setItem(SUMMARY_KEY(stage), JSON.stringify({
           summary: summaryText,
