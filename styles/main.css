@@ -937,6 +937,18 @@ body.lightbox-open {
   gap: 0.9rem;
 }
 
+.settings-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
 .settings-form label {
   font-weight: 600;
 }
@@ -946,6 +958,17 @@ body.lightbox-open {
   border-radius: 0.8rem;
   border: 1px solid var(--accent-light);
   font-size: 1rem;
+}
+
+.settings-form input[type='file'] {
+  padding: 0.6rem 0.85rem;
+  background: #f6f8fb;
+}
+
+.form-hint {
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0;
 }
 
 .form-actions {

@@ -35,7 +35,8 @@
       <h2>API Key Access</h2>
       <p>
         Add API keys for each provider and choose which one powers workspace conversations. Keys are stored locally per workspace
-        so the chat experience remains the same once a provider is selected.
+        so the chat experience remains the same once a provider is selected. You can also upload background knowledge (Word, PDF,
+        or image files) so the workspace can reference the material when responding.
       </p>
       <p class="form-status info" id="active-provider-status" aria-live="polite"></p>
       <div class="settings-tabs" role="tablist" aria-label="API providers">
@@ -52,8 +53,18 @@
       <div class="settings-panels">
         <div class="settings-panel active" id="provider-chatgpt" role="tabpanel">
           <form class="settings-form" data-provider="chatgpt">
-            <label for="chatgpt-key">ChatGPT API Key</label>
-            <input id="chatgpt-key" type="password" name="apiKey" placeholder="sk-..." autocomplete="off" />
+            <div class="settings-fields">
+              <div class="settings-field">
+                <label for="chatgpt-key">ChatGPT API Key</label>
+                <input id="chatgpt-key" type="password" name="apiKey" placeholder="sk-..." autocomplete="off" />
+              </div>
+              <div class="settings-field">
+                <label for="chatgpt-knowledge">Background knowledge</label>
+                <input id="chatgpt-knowledge" class="file-input" type="file" name="knowledge"
+                  accept=".doc,.docx,.pdf,image/*" multiple />
+                <p class="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+              </div>
+            </div>
             <div class="form-actions">
               <button type="submit">Save Key</button>
               <button type="button" class="secondary use-provider">Use in workspace</button>
@@ -63,8 +74,18 @@
         </div>
         <div class="settings-panel" id="provider-gemini" role="tabpanel" hidden>
           <form class="settings-form" data-provider="gemini">
-            <label for="gemini-key">Gemini API Key</label>
-            <input id="gemini-key" type="password" name="apiKey" placeholder="AIza..." autocomplete="off" />
+            <div class="settings-fields">
+              <div class="settings-field">
+                <label for="gemini-key">Gemini API Key</label>
+                <input id="gemini-key" type="password" name="apiKey" placeholder="AIza..." autocomplete="off" />
+              </div>
+              <div class="settings-field">
+                <label for="gemini-knowledge">Background knowledge</label>
+                <input id="gemini-knowledge" class="file-input" type="file" name="knowledge"
+                  accept=".doc,.docx,.pdf,image/*" multiple />
+                <p class="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+              </div>
+            </div>
             <div class="form-actions">
               <button type="submit">Save Key</button>
               <button type="button" class="secondary use-provider">Use in workspace</button>
@@ -74,8 +95,18 @@
         </div>
         <div class="settings-panel" id="provider-deepseek" role="tabpanel" hidden>
           <form class="settings-form" data-provider="deepseek">
-            <label for="deepseek-key">DeepSeek API Key</label>
-            <input id="deepseek-key" type="password" name="apiKey" placeholder="sk-..." autocomplete="off" />
+            <div class="settings-fields">
+              <div class="settings-field">
+                <label for="deepseek-key">DeepSeek API Key</label>
+                <input id="deepseek-key" type="password" name="apiKey" placeholder="sk-..." autocomplete="off" />
+              </div>
+              <div class="settings-field">
+                <label for="deepseek-knowledge">Background knowledge</label>
+                <input id="deepseek-knowledge" class="file-input" type="file" name="knowledge"
+                  accept=".doc,.docx,.pdf,image/*" multiple />
+                <p class="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+              </div>
+            </div>
             <div class="form-actions">
               <button type="submit">Save Key</button>
               <button type="button" class="secondary use-provider">Use in workspace</button>
