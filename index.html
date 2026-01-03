@@ -93,6 +93,63 @@
         <button type="button" class="audience-card__action">Sign In</button>
       </article>
     </section>
+
+    <section class="workspace-login" aria-labelledby="workspace-login-heading">
+      <h2 id="workspace-login-heading">Access Your Workspace</h2>
+      <p>
+        Enter the access code provided for your team to open a dedicated workspace. Each code stores its own dialogue, evidence, and summaries so that multiple teams can explore the platform independently.
+      </p>
+      <form id="workspace-access-form" class="login-form">
+        <label for="workspace-code">Workspace Access Code</label>
+        <div class="login-input-group">
+          <input id="workspace-code" name="workspace-code" type="text" autocomplete="off" required placeholder="Enter code (e.g., TEAM-42)" />
+          <button type="submit">Open Workspace</button>
+        </div>
+        <p id="login-feedback" class="login-feedback" role="alert" hidden></p>
+      </form>
+    </section>
   </main>
+  <script>
+    (function () {
+      const STORAGE_PREFIX = 'ppss';
+      const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
+      const form = document.getElementById('workspace-access-form');
+      const codeInput = document.getElementById('workspace-code');
+      const feedback = document.getElementById('login-feedback');
+
+      function showFeedback(message, tone = 'info') {
+        if (!feedback) return;
+        feedback.textContent = message;
+        feedback.className = `login-feedback ${tone === 'error' ? 'error' : tone === 'success' ? 'success' : ''}`.trim();
+        feedback.hidden = !message;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('login') === 'required') {
+        showFeedback('워크스페이스에 접근하려면 코드를 입력하세요.', 'error');
+        params.delete('login');
+        const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+      } else {
+        const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+        if (stored) {
+          codeInput.value = stored;
+          showFeedback(`최근에 열린 워크스페이스 코드 ${stored} 가 준비되어 있습니다. 새로운 코드를 입력하면 변경됩니다.`, 'info');
+        }
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const code = codeInput.value.trim();
+        if (!code) {
+          showFeedback('유효한 코드를 입력하세요.', 'error');
+          return;
+        }
+        localStorage.setItem(ACTIVE_WORKSPACE_KEY, code);
+        showFeedback('워크스페이스를 여는 중입니다...', 'success');
+        window.location.href = `workspace.html?code=${encodeURIComponent(code)}`;
+      });
+    })();
+  </script>
 </body>
 </html>
