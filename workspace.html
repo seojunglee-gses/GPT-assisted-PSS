@@ -644,7 +644,9 @@
         const SUMMARY_KEY = (stage) => `${WORKSPACE_PREFIX}-summary-${stage}`;
         const STATUS_KEY = `${WORKSPACE_PREFIX}-stage-status`;
         const RANKING_KEY = `${WORKSPACE_PREFIX}-evaluation-rankings`;
-        const CHAT_COMPLETIONS_ENDPOINT = '/api/chat'; // Proxy should inject workspace-specific API credentials
+        const CHAT_COMPLETIONS_ENDPOINT = '/api/chat';
+        const API_KEYS_KEY = `${WORKSPACE_PREFIX}-api-keys`;
+        const ACTIVE_PROVIDER_KEY = `${WORKSPACE_PREFIX}-api-provider`;
 
         const workspaceMeta = document.getElementById('workspace-meta');
         const workspaceCodeDisplay = document.getElementById('workspace-code-display');
@@ -663,6 +665,16 @@
           console.warn('Unable to parse storage for', key, error);
           return fallback;
         }
+      }
+
+      function getActiveProvider() {
+        const stored = localStorage.getItem(ACTIVE_PROVIDER_KEY);
+        return stored ? stored.trim() : 'chatgpt';
+      }
+
+      function getApiKey(provider) {
+        const keys = parseStoredJSON(API_KEYS_KEY, {});
+        return keys[provider] ? keys[provider].trim() : '';
       }
 
       const stageStatus = parseStoredJSON(STATUS_KEY, {});
@@ -934,12 +946,28 @@
 
       async function callChatGPT(messages, options = {}) {
         try {
+          const provider = options.provider || getActiveProvider();
+          const apiKey = getApiKey(provider);
+
+          if (!apiKey) {
+            return {
+              role: 'assistant',
+              content:
+                'No API key is configured for this workspace. Add a key in Settings to resume chat.',
+              error: true
+            };
+          }
+
           const response = await fetch(CHAT_COMPLETIONS_ENDPOINT, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-API-Provider': provider,
+              'X-API-Key': apiKey
             },
             body: JSON.stringify({
+              provider,
+              apiKey,
               model: options.model || 'gpt-4o',
               messages,
               temperature: 0.4
