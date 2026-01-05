@@ -1,0 +1,383 @@
+import { useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
+
+export default function Report() {
+  useEffect(() => {
+    const STORAGE_PREFIX = 'ppss';
+    const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
+
+    const params = new URLSearchParams(window.location.search);
+    let workspaceId = params.get('code');
+    if (workspaceId) {
+      workspaceId = workspaceId.trim();
+      if (workspaceId) {
+        localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
+      }
+    }
+
+    if (!workspaceId) {
+      const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+      workspaceId = stored ? stored.trim() : '';
+    }
+
+    if (!workspaceId) {
+      window.location.replace('/?login=required');
+      return;
+    }
+
+    if (params.has('code')) {
+      params.delete('code');
+      const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+
+    const workspaceKeySegment = encodeURIComponent(workspaceId);
+    const WORKSPACE_PREFIX = `${STORAGE_PREFIX}-workspace-${workspaceKeySegment}`;
+    const SUMMARY_KEY = (stage) => `${WORKSPACE_PREFIX}-summary-${stage}`;
+    const CONVERSATION_KEY = (stage) => `${WORKSPACE_PREFIX}-conversation-${stage}`;
+    const AGGREGATE_KEY = `${WORKSPACE_PREFIX}-summary-aggregate`;
+    const API_KEY_STORAGE = `${WORKSPACE_PREFIX}-openai-key`;
+
+    const workspaceMeta = document.getElementById('report-workspace-meta');
+    const workspaceCodeDisplay = document.getElementById('report-workspace-code');
+    if (workspaceCodeDisplay) {
+      workspaceCodeDisplay.textContent = workspaceId;
+    }
+    if (workspaceMeta) {
+      workspaceMeta.hidden = false;
+    }
+
+    const stageDefinitions = [
+      { id: 'problem-definition', title: 'Problem Definition' },
+      { id: 'data-analysis', title: 'Data Analysis' },
+      { id: 'design-alternatives', title: 'Design/Plan Alternatives' },
+      { id: 'design-evaluation', title: 'Design/Plan Evaluation' }
+    ];
+
+    function parseStoredJSON(key, fallback = null) {
+      try {
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : fallback;
+      } catch (error) {
+        console.warn('Unable to parse data for', key, error);
+        return fallback;
+      }
+    }
+
+    function parseSummary(stageId) {
+      return parseStoredJSON(SUMMARY_KEY(stageId), null);
+    }
+
+    function loadConversation(stageId) {
+      return parseStoredJSON(CONVERSATION_KEY(stageId), []);
+    }
+
+    function formatTimestamp(value) {
+      if (!value) return null;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date.toLocaleString();
+    }
+
+    async function callChatGPT(messages, { model = 'gpt-4o-mini' } = {}) {
+      const apiKey = localStorage.getItem(API_KEY_STORAGE);
+      if (!apiKey) {
+        return { role: 'assistant', content: '', error: true };
+      }
+
+      try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            temperature: 0.2
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`OpenAI request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        const choice = data.choices && data.choices[0];
+        if (!choice || !choice.message) {
+          throw new Error('No completion returned');
+        }
+
+        return {
+          role: choice.message.role || 'assistant',
+          content: choice.message.content,
+          error: false
+        };
+      } catch (error) {
+        console.warn('Aggregate summary generation failed', error);
+        return { role: 'assistant', content: '', error: true };
+      }
+    }
+
+    const navContainer = document.getElementById('report-stage-nav');
+    const panel = document.getElementById('report-stage-panel');
+    const aggregateBody = document.getElementById('aggregate-summary-body');
+    const aggregateTimestamp = document.getElementById('aggregate-summary-timestamp');
+    let navButtons = [];
+    let activeStageIndex = 0;
+
+    function setAggregateContent(summary, timestamp) {
+      aggregateBody.textContent = summary;
+      if (timestamp) {
+        const formatted = formatTimestamp(timestamp);
+        if (formatted) {
+          aggregateTimestamp.textContent = `Updated ${formatted}`;
+          aggregateTimestamp.hidden = false;
+          return;
+        }
+      }
+      aggregateTimestamp.hidden = true;
+      aggregateTimestamp.textContent = '';
+    }
+
+    function renderStagePanel(stage) {
+      const summaryInfo = parseSummary(stage.id);
+      panel.innerHTML = '';
+      panel.dataset.stage = stage.id;
+
+      const heading = document.createElement('h3');
+      heading.textContent = stage.title;
+      panel.appendChild(heading);
+
+      const body = document.createElement('p');
+      body.className = 'summary-body';
+
+      if (summaryInfo && summaryInfo.summary) {
+        body.textContent = summaryInfo.summary;
+        panel.classList.remove('empty');
+      } else {
+        body.textContent =
+          'No summary has been published yet. Complete this stage in the workspace to surface insights here.';
+        panel.classList.add('empty');
+      }
+
+      panel.appendChild(body);
+
+      if (summaryInfo && summaryInfo.timestamp) {
+        const formatted = formatTimestamp(summaryInfo.timestamp);
+        if (formatted) {
+          const timestamp = document.createElement('p');
+          timestamp.className = 'summary-timestamp';
+          timestamp.textContent = `Updated ${formatted}`;
+          panel.appendChild(timestamp);
+        }
+      }
+
+      const conversation = loadConversation(stage.id);
+      if (conversation && conversation.length) {
+        const totals = document.createElement('p');
+        totals.className = 'conversation-meta';
+        const turns = conversation.length;
+        const participants = Array.from(
+          new Set(
+            conversation.map((entry) =>
+              entry.role ? entry.role.charAt(0).toUpperCase() + entry.role.slice(1) : 'Unknown'
+            )
+          )
+        );
+        totals.textContent = `${turns} message${turns === 1 ? '' : 's'} captured · Roles: ${participants.join(', ')}`;
+        panel.appendChild(totals);
+      }
+
+      const link = document.createElement('a');
+      link.className = 'stage-link';
+      link.href = `/workspace#${stage.id}`;
+      link.textContent = 'Open stage in workspace';
+      panel.appendChild(link);
+    }
+
+    function showStage(index) {
+      navButtons.forEach((button, idx) => {
+        const isActive = idx === index;
+        button.classList.toggle('active', isActive);
+        button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      const activeStage = stageDefinitions[index];
+      const activeButton = navButtons[index];
+      if (activeStage && activeButton) {
+        panel.setAttribute('aria-labelledby', activeButton.id);
+        renderStagePanel(activeStage);
+      }
+
+      activeStageIndex = index;
+    }
+
+    function buildNavigation() {
+      navContainer.innerHTML = '';
+      navButtons = stageDefinitions.map((stage, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'report-stage-button';
+        button.dataset.stage = stage.id;
+        button.dataset.index = index.toString();
+        button.id = `report-tab-${stage.id}`;
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-controls', 'report-stage-panel');
+        button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+        button.textContent = stage.title;
+        button.addEventListener('click', () => {
+          if (window.location.hash === `#${stage.id}`) {
+            showStage(index);
+          } else {
+            window.location.hash = stage.id;
+          }
+        });
+        navContainer.appendChild(button);
+        return button;
+      });
+    }
+
+    async function buildAggregateSummary() {
+      const stageSummaries = stageDefinitions
+        .map((stage) => ({ stage, info: parseSummary(stage.id) }))
+        .filter((entry) => entry.info && entry.info.summary);
+
+      if (!stageSummaries.length) {
+        setAggregateContent('Publish at least one workspace summary to see the cross-stage executive overview.', null);
+        localStorage.removeItem(AGGREGATE_KEY);
+        return;
+      }
+
+      const latestDependency = stageSummaries.reduce((acc, entry) => {
+        const timestamp = entry.info && entry.info.timestamp ? Date.parse(entry.info.timestamp) : 0;
+        return Number.isNaN(timestamp) ? acc : Math.max(acc, timestamp);
+      }, 0);
+
+      const storedAggregate = parseStoredJSON(AGGREGATE_KEY, null);
+      if (storedAggregate && storedAggregate.dependency === latestDependency && storedAggregate.summary) {
+        setAggregateContent(storedAggregate.summary, storedAggregate.timestamp);
+        return;
+      }
+
+      setAggregateContent('Generating the integrated summary...', null);
+
+      const apiKey = localStorage.getItem(API_KEY_STORAGE);
+      let summaryText = '';
+
+      if (apiKey) {
+        const combined = stageSummaries
+          .map((entry) => `Stage: ${entry.stage.title}\nSummary: ${entry.info.summary}`)
+          .join('\n\n');
+        const messages = [
+          {
+            role: 'system',
+            content:
+              'You are a proactive product-service system reporting analyst who writes succinct executive summaries aligned with sustainability strategy outcomes.'
+          },
+          {
+            role: 'user',
+            content:
+              'Merge the following stage summaries into a single cohesive overview of no more than 140 words. Highlight strategic progress, sustainability impact, and recommended next moves.\n\n' +
+              combined
+          }
+        ];
+        const completion = await callChatGPT(messages, { model: 'gpt-4o-mini' });
+        if (!completion.error && completion.content) {
+          summaryText = completion.content;
+        }
+      }
+
+      if (!summaryText) {
+        summaryText = stageSummaries.map((entry) => `${entry.stage.title}: ${entry.info.summary}`).join('\n\n');
+      }
+
+      const timestamp = new Date().toISOString();
+      setAggregateContent(summaryText, timestamp);
+      localStorage.setItem(AGGREGATE_KEY, JSON.stringify({ summary: summaryText, timestamp, dependency: latestDependency }));
+    }
+
+    buildNavigation();
+
+    function syncStageFromHash() {
+      const currentHash = window.location.hash.replace('#', '');
+      const index = stageDefinitions.findIndex((stage) => stage.id === currentHash);
+      showStage(index >= 0 ? index : 0);
+    }
+
+    window.addEventListener('hashchange', syncStageFromHash);
+
+    syncStageFromHash();
+    buildAggregateSummary();
+
+    window.addEventListener('storage', (event) => {
+      if (!event.key) return;
+      const isSummaryUpdate = stageDefinitions.some((stage) => event.key === SUMMARY_KEY(stage.id));
+      const isConversationUpdate = stageDefinitions.some((stage) => event.key === CONVERSATION_KEY(stage.id));
+
+      if (isSummaryUpdate) {
+        buildAggregateSummary();
+      }
+
+      if (isSummaryUpdate || isConversationUpdate) {
+        showStage(activeStageIndex);
+      }
+    });
+  }, []);
+
+  return (
+    <div className="page">
+      <Sidebar active="report" />
+      <main className="content">
+        <header>
+          <h1>Insightful Reports</h1>
+        </header>
+        <section>
+          <p>
+            This space consolidates evaluation results, scenario comparisons, and stakeholder feedback captured across the PPSS
+            design journey. Auto-generated summaries preserve the rationale behind design decisions, mirroring the evidence-based
+            reporting highlighted in the case study.
+          </p>
+          <p>
+            Export options will allow the team to share updates with partners and align future iterations with the strategic
+            roadmap introduced in the research.
+          </p>
+          <p className="workspace-meta" id="report-workspace-meta" hidden>
+            Viewing reports for workspace code: <span className="workspace-code-emphasis" id="report-workspace-code"></span>
+          </p>
+        </section>
+        <section className="report-overview">
+          <h2>Integrated Dialogue Summary</h2>
+          <p className="section-intro">
+            A concise narrative synthesising every PPSS dialogue ensures stakeholders can grasp the evolving strategy before
+            diving into stage-level highlights.
+          </p>
+          <article className="aggregate-card" id="aggregate-summary-card" aria-live="polite">
+            <p className="summary-body" id="aggregate-summary-body">
+              Engage with each workspace stage and publish its summary to generate the integrated storyline here.
+            </p>
+            <p className="summary-timestamp" id="aggregate-summary-timestamp" hidden></p>
+          </article>
+        </section>
+
+        <section className="report-stage-summaries">
+          <h2>Workspace Dialogue Summaries</h2>
+          <p className="section-intro">
+            Navigate the PPSS workflow to review the ChatGPT-assisted synopsis for each stage and keep decision-makers aligned
+            with the latest intelligence.
+          </p>
+          <div className="report-flow">
+            <div className="report-stage-navigation" id="report-stage-nav" role="tablist" aria-label="Stage summaries"></div>
+            <article
+              className="report-stage-panel"
+              id="report-stage-panel"
+              role="tabpanel"
+              tabIndex="0"
+              aria-live="polite"
+            ></article>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

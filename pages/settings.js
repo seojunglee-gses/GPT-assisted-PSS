@@ -1,0 +1,275 @@
+import { useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
+
+export default function Settings() {
+  useEffect(() => {
+    const STORAGE_PREFIX = 'ppss';
+    const ACTIVE_WORKSPACE_KEY = `${STORAGE_PREFIX}-active-code`;
+
+    const params = new URLSearchParams(window.location.search);
+    let workspaceId = params.get('code');
+    if (workspaceId) {
+      workspaceId = workspaceId.trim();
+      if (workspaceId) {
+        localStorage.setItem(ACTIVE_WORKSPACE_KEY, workspaceId);
+      }
+    }
+
+    if (!workspaceId) {
+      const stored = localStorage.getItem(ACTIVE_WORKSPACE_KEY);
+      workspaceId = stored ? stored.trim() : '';
+    }
+
+    if (!workspaceId) {
+      window.location.replace('/?login=required');
+      return;
+    }
+
+    if (params.has('code')) {
+      params.delete('code');
+      const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${window.location.hash}`;
+      window.history.replaceState({}, '', newUrl);
+    }
+
+    const workspaceKeySegment = encodeURIComponent(workspaceId);
+    const WORKSPACE_PREFIX = `${STORAGE_PREFIX}-workspace-${workspaceKeySegment}`;
+    const API_KEYS_KEY = `${WORKSPACE_PREFIX}-api-keys`;
+    const ACTIVE_PROVIDER_KEY = `${WORKSPACE_PREFIX}-api-provider`;
+
+    const workspaceMeta = document.getElementById('settings-workspace-meta');
+    const workspaceCodeDisplay = document.getElementById('settings-workspace-code');
+    if (workspaceCodeDisplay) {
+      workspaceCodeDisplay.textContent = workspaceId;
+    }
+    if (workspaceMeta) {
+      workspaceMeta.hidden = false;
+    }
+
+    const providerTabs = Array.from(document.querySelectorAll('.settings-tab'));
+    const providerPanels = Array.from(document.querySelectorAll('.settings-panel'));
+    const providerForms = Array.from(document.querySelectorAll('.settings-form'));
+    const activeProviderStatus = document.getElementById('active-provider-status');
+
+    function parseStoredJSON(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (error) {
+        console.warn('Unable to parse storage for', key, error);
+        return fallback;
+      }
+    }
+
+    function getStoredKeys() {
+      return parseStoredJSON(API_KEYS_KEY, {});
+    }
+
+    function getActiveProvider() {
+      const stored = localStorage.getItem(ACTIVE_PROVIDER_KEY);
+      return stored ? stored.trim() : 'chatgpt';
+    }
+
+    function setActiveProvider(provider) {
+      localStorage.setItem(ACTIVE_PROVIDER_KEY, provider);
+      updateActiveProviderStatus(provider);
+    }
+
+    function updateActiveProviderStatus(provider) {
+      if (!activeProviderStatus) return;
+      const label = provider === 'gemini' ? 'Gemini' : provider === 'deepseek' ? 'DeepSeek' : 'ChatGPT';
+      activeProviderStatus.textContent = `Current workspace provider: ${label}`;
+    }
+
+    function showProvider(provider) {
+      providerTabs.forEach((tab) => {
+        const isActive = tab.dataset.provider === provider;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      providerPanels.forEach((panel) => {
+        const shouldShow = panel.id === `provider-${provider}`;
+        panel.classList.toggle('active', shouldShow);
+        panel.toggleAttribute('hidden', !shouldShow);
+      });
+    }
+
+    const storedKeys = getStoredKeys();
+    providerForms.forEach((form) => {
+      const provider = form.dataset.provider;
+      const input = form.querySelector('input[name="apiKey"]');
+      const status = form.querySelector('.form-status');
+      const useButton = form.querySelector('.use-provider');
+      if (input) {
+        input.value = storedKeys[provider] || '';
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!input || !status) return;
+        const nextKeys = getStoredKeys();
+        const value = input.value.trim();
+        if (value) {
+          nextKeys[provider] = value;
+        } else {
+          delete nextKeys[provider];
+        }
+        localStorage.setItem(API_KEYS_KEY, JSON.stringify(nextKeys));
+        status.textContent = value ? 'API key saved for this workspace.' : 'API key cleared.';
+        status.className = `form-status ${value ? 'success' : 'warning'}`.trim();
+      });
+
+      if (useButton) {
+        useButton.addEventListener('click', () => {
+          setActiveProvider(provider);
+          if (status) {
+            status.textContent = 'Provider applied to the workspace.';
+            status.className = 'form-status success';
+          }
+        });
+      }
+    });
+
+    providerTabs.forEach((tab) => {
+      tab.addEventListener('click', () => showProvider(tab.dataset.provider));
+    });
+
+    const initialProvider = getActiveProvider();
+    updateActiveProviderStatus(initialProvider);
+    showProvider(initialProvider);
+  }, []);
+
+  return (
+    <div className="page">
+      <Sidebar active="settings" />
+      <main className="content">
+        <header>
+          <h1>Platform Settings</h1>
+        </header>
+        <section>
+          <p>
+            Configure access levels, integrate organizational data sources, and tailor the conversational tone of ChatGPT to
+            match the domain expertise required in proactive PPSS development.
+          </p>
+          <p>
+            Personalization ensures that analytics dashboards, co-design templates, and notification routines align with the
+            operational context presented in the study.
+          </p>
+          <p className="workspace-meta" id="settings-workspace-meta" hidden>
+            Managing settings for workspace code:{' '}
+            <span className="workspace-code-emphasis" id="settings-workspace-code"></span>
+          </p>
+        </section>
+        <section className="settings-card">
+          <h2>API Key Access</h2>
+          <p>
+            Add API keys for each provider and choose which one powers workspace conversations. Keys are stored locally per
+            workspace so the chat experience remains the same once a provider is selected. You can also upload background
+            knowledge (Word, PDF, or image files) so the workspace can reference the material when responding.
+          </p>
+          <p className="form-status info" id="active-provider-status" aria-live="polite"></p>
+          <div className="settings-tabs" role="tablist" aria-label="API providers">
+            <button type="button" className="settings-tab active" data-provider="chatgpt" role="tab" aria-selected="true">
+              ChatGPT
+            </button>
+            <button type="button" className="settings-tab" data-provider="gemini" role="tab" aria-selected="false">
+              Gemini
+            </button>
+            <button type="button" className="settings-tab" data-provider="deepseek" role="tab" aria-selected="false">
+              DeepSeek
+            </button>
+          </div>
+          <div className="settings-panels">
+            <div className="settings-panel active" id="provider-chatgpt" role="tabpanel">
+              <form className="settings-form" data-provider="chatgpt">
+                <div className="settings-fields">
+                  <div className="settings-field">
+                    <label htmlFor="chatgpt-key">ChatGPT API Key</label>
+                    <input id="chatgpt-key" type="password" name="apiKey" placeholder="sk-..." autoComplete="off" />
+                  </div>
+                  <div className="settings-field">
+                    <label htmlFor="chatgpt-knowledge">Background knowledge</label>
+                    <input
+                      id="chatgpt-knowledge"
+                      className="file-input"
+                      type="file"
+                      name="knowledge"
+                      accept=".doc,.docx,.pdf,image/*"
+                      multiple
+                    />
+                    <p className="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button type="submit">Save Key</button>
+                  <button type="button" className="secondary use-provider">
+                    Use in workspace
+                  </button>
+                </div>
+                <p className="form-status" aria-live="polite"></p>
+              </form>
+            </div>
+            <div className="settings-panel" id="provider-gemini" role="tabpanel" hidden>
+              <form className="settings-form" data-provider="gemini">
+                <div className="settings-fields">
+                  <div className="settings-field">
+                    <label htmlFor="gemini-key">Gemini API Key</label>
+                    <input id="gemini-key" type="password" name="apiKey" placeholder="AIza..." autoComplete="off" />
+                  </div>
+                  <div className="settings-field">
+                    <label htmlFor="gemini-knowledge">Background knowledge</label>
+                    <input
+                      id="gemini-knowledge"
+                      className="file-input"
+                      type="file"
+                      name="knowledge"
+                      accept=".doc,.docx,.pdf,image/*"
+                      multiple
+                    />
+                    <p className="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button type="submit">Save Key</button>
+                  <button type="button" className="secondary use-provider">
+                    Use in workspace
+                  </button>
+                </div>
+                <p className="form-status" aria-live="polite"></p>
+              </form>
+            </div>
+            <div className="settings-panel" id="provider-deepseek" role="tabpanel" hidden>
+              <form className="settings-form" data-provider="deepseek">
+                <div className="settings-fields">
+                  <div className="settings-field">
+                    <label htmlFor="deepseek-key">DeepSeek API Key</label>
+                    <input id="deepseek-key" type="password" name="apiKey" placeholder="sk-..." autoComplete="off" />
+                  </div>
+                  <div className="settings-field">
+                    <label htmlFor="deepseek-knowledge">Background knowledge</label>
+                    <input
+                      id="deepseek-knowledge"
+                      className="file-input"
+                      type="file"
+                      name="knowledge"
+                      accept=".doc,.docx,.pdf,image/*"
+                      multiple
+                    />
+                    <p className="form-hint">Upload Word, PDF, or image files to seed the workspace context.</p>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button type="submit">Save Key</button>
+                  <button type="button" className="secondary use-provider">
+                    Use in workspace
+                  </button>
+                </div>
+                <p className="form-status" aria-live="polite"></p>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
